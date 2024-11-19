@@ -1,0 +1,69 @@
+<?php
+
+use CodeIgniter\Router\RouteCollection;
+
+/**
+ * @var RouteCollection $routes
+ */
+$routes->get('/', 'Templates::index');
+$routes->get('/restricted', 'restricted::index');
+
+// Login 
+$routes->get('login', 'Login::index');
+$routes->post('login/auth', 'Login::auth');
+$routes->post('login/logout', 'Login::logout');
+
+// Users
+$routes->get('/users', 'users::index');
+$routes->get('/users/add', 'users::add');
+$routes->post('/users/saveData', 'users::saveData');
+$routes->post('/users/index', 'users::index');
+$routes->post('/users/edit', 'users::edit');
+$routes->get('users/edit/(:any)', 'users::edit/$1');
+$routes->get('users/changePassword/(:any)', 'users::changePassword/$1');
+$routes->post('users/update', 'users::updateData');
+$routes->post('users/updatePassword', 'users::updatePassword');
+$routes->post('/users/delete', 'users::delete');
+$routes->get('/users/index', 'users::index');
+$routes->get('users/fetchDataLevels', 'Users::fetchDataLevels');
+
+// Categories
+$routes->get('categories', 'Categories::index');
+$routes->match(['get', 'post'], 'categories', 'Categories::index');
+$routes->get('/categories/add', 'Categories::add');
+$routes->post('/categories/add', 'Categories::add');
+$routes->post('/categories/saveData', 'Categories::saveData');
+$routes->post('/categories/delete', 'Categories::delete');
+$routes->post('/categories/edit', 'Categories::edit');
+$routes->post('/categories/update', 'Categories::update');
+
+// Units
+$routes->get('units', 'Units::index');
+$routes->post('units/showUnitData', 'Units::showUnitData');
+$routes->post('/units/delete', 'Units::delete');
+$routes->match(['get', 'post'], 'Units', 'Units::index');
+$routes->post('/units/edit', 'Units::edit');
+$routes->post('/units/update', 'Units::update');
+$routes->post('/units/add', 'Units::add');
+$routes->post('/units/saveData', 'Units::saveData');
+
+// Products
+$routes->get('products', 'Products::index');
+$routes->get('products/index', 'Products::index');
+$routes->post('products/index', 'Products::index');
+$routes->get('products/add', 'Products::add');
+$routes->get('products/fetchDataUnits', 'Products::fetchDataUnits');
+$routes->get('products/fetchDataCategories', 'Products::fetchDataCategories');
+$routes->post('products/saveData', 'Products::saveData');
+$routes->post('products/delete', 'Products::delete');
+$routes->get('products/edit/(:any)', 'Products::edit/$1');
+$routes->post('products/update', 'Products::updateData');
+
+// Levels
+$routes->get('levels', 'levels::index');
+$routes->get('levels/add', 'levels::add');
+$routes->post('levels/add', 'levels::add');
+$routes->post('levels/saveData', 'levels::saveData');
+$routes->post('levels/delete', 'levels::delete');
+$routes->post('levels/edit', 'levels::edit');
+$routes->post('levels/update', 'levels::update');

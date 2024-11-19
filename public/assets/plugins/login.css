@@ -1,0 +1,28 @@
+.divider:after,
+.divider:before {
+content: "";
+flex: 1;
+height: 1px;
+background: #eee;
+}
+.h-custom {
+height: calc(100% - 72px);
+}
+@media (max-width: 450px) {
+.h-custom {
+height: 100%;
+}
+}
+.heading {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #007bff;
+}
+.forgot {
+    color: #007bff !important;
+    text-decoration: underline;
+}
+.remember-me {
+    font-weight: 300 !important;
+    cursor: pointer;
+}
