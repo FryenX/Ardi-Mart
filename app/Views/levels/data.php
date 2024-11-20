@@ -1,7 +1,7 @@
 <?= $this->extend('templates/menu') ?>
 
 <?= $this->section('title') ?>
-<h3>Levels</h3>
+<h3><i class="fa fa-share"></i> Levels</h3>
 <?= $this->endSection(); ?>
 
 <?= $this->section('content') ?>

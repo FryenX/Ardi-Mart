@@ -67,3 +67,7 @@ $routes->post('levels/saveData', 'levels::saveData');
 $routes->post('levels/delete', 'levels::delete');
 $routes->post('levels/edit', 'levels::edit');
 $routes->post('levels/update', 'levels::update');
+
+// Transactions
+$routes->get('transactions', 'Transactions::index');
+$routes->get('transactions/input', 'Transactions::input');

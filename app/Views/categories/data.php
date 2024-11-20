@@ -1,7 +1,7 @@
 <?= $this->extend('templates/menu') ?>
 
 <?= $this->section('title') ?>
-<h3>Categories</h3>
+<h3><i class="fa fa-list"></i> Categories</h3>
 <?= $this->endSection(); ?>
 
 <?= $this->section('content') ?>

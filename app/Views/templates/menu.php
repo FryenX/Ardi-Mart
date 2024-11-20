@@ -14,6 +14,7 @@ $userLevel = session()->get('level_info');
         </p>
     </a>
 </li>
+<li class="nav-header">Master</li>
 <?php
 if ($userLevel == 'Admin' || $userLevel == 'Manager') {
     echo "<li class='nav-item'>
@@ -26,7 +27,6 @@ if ($userLevel == 'Admin' || $userLevel == 'Manager') {
         </li>";
 }
 ?>
-
 <li class="nav-item">
     <a href="<?= site_url('categories') ?>" class="nav-link">
         <i class="nav-icon fa fa-list"></i>
@@ -63,4 +63,13 @@ if ($userLevel == 'Admin' || $userLevel == 'Manager') {
     </li>";
 }
 ?>
+<li class="nav-header">Transaction</li>
+<li class="nav-item">
+    <a href="<?= site_url('transactions') ?>" class="nav-link">
+        <i class="nav-icon fa fa-table"></i>
+        <p>
+            Sale
+        </p>
+    </a>
+</li>
 <?= $this->endSection() ?>
