@@ -28,6 +28,14 @@ class Customers extends Migration
                 'type'           => 'CHAR',
                 'constraint'     => '20',
                 'null'           => false,
+            ],
+            'created_at'    => [
+                'type'           => 'DATETIME',
+                'null'           => false
+            ],
+            'updated_at'    => [
+                'type'           => 'DATETIME',
+                'null'           => false
             ]
         ]);
         $this->forge->addKey('id', true);

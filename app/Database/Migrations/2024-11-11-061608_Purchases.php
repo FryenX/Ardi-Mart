@@ -14,8 +14,8 @@ class Purchases extends Migration
                 'constraint'      => '20',
                 'null'            => false
             ],
-            'date' => [
-                'type'            => 'DATE',
+            'date_time' => [
+                'type'            => 'DATETIME',
                 'null'            => false
             ],
             'payment' => [

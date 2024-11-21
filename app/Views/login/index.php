@@ -150,7 +150,7 @@
                                 html: response.failed,
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location = '<?= site_url('login') ?>'
+                                    
                                 }
                             });
                         }

@@ -26,6 +26,6 @@ class Units extends Migration
 
     public function down()
     {
-        //
+        $this->forge->dropTable('units');
     }
 }

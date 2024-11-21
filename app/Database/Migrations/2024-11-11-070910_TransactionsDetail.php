@@ -14,12 +14,12 @@ class TransactionsDetail extends Migration
                 'auto_increment' => true,
                 'null'           => false
             ],
-            'transaction_invoice' => [
+            'invoice' => [
                 'type'            => 'CHAR',
                 'constraint'     => '20',
                 'null'            => false
             ],
-            'product_barcode'    => [
+            'barcode'    => [
                 'type'           => 'CHAR',
                 'constraint'     => '50',
                 'null'           => false
@@ -50,8 +50,8 @@ class TransactionsDetail extends Migration
             ]
         ]);
         $this->forge->addPrimaryKey('id');
-        $this->forge->addForeignKey('transaction_invoice', 'transactions', 'invoice', 'CASCADE');
-        $this->forge->addForeignKey('product_barcode', 'products', 'barcode', 'CASCADE');
+        $this->forge->addForeignKey('invoice', 'transactions', 'invoice', 'CASCADE');
+        $this->forge->addForeignKey('barcode', 'products', 'barcode', 'CASCADE');
         $this->forge->createTable('transactions_detail');
     }
 

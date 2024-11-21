@@ -71,3 +71,9 @@ $routes->post('levels/update', 'levels::update');
 // Transactions
 $routes->get('transactions', 'Transactions::index');
 $routes->get('transactions/input', 'Transactions::input');
+$routes->post('transactions/createInvoice', 'Transactions::createInvoice');
+$routes->post('transactions/dataDetail', 'Transactions::dataDetail');
+$routes->get('transactions/viewProductData', 'Transactions::viewProductData');
+$routes->post('transactions/productDataList', 'Transactions::productDataList');
+$routes->post('transactions/saveTemp', 'Transactions::saveTemp');
+$routes->post('transactions/viewProductData', 'Transactions::viewProductData');

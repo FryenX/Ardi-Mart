@@ -14,7 +14,7 @@ class TempTransactions extends Migration
                 'auto_increment' => true,
                 'null'           => false
             ],
-            'transaction_invoice' => [
+            'invoice' => [
                 'type'            => 'VARCHAR',
                 'constraint'      => '50',
                 'null'            => false

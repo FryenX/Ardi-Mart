@@ -14,8 +14,8 @@ class Transactions extends Migration
                 'constraint'      => '50',
                 'null'            => false
             ],
-            'date' => [
-                'type'            => 'DATE',
+            'date_time' => [
+                'type'            => 'DATETIME',
                 'null'            => false
             ],
             'customer_id' => [
