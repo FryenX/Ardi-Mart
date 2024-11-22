@@ -77,3 +77,6 @@ $routes->get('transactions/viewProductData', 'Transactions::viewProductData');
 $routes->post('transactions/productDataList', 'Transactions::productDataList');
 $routes->post('transactions/saveTemp', 'Transactions::saveTemp');
 $routes->post('transactions/viewProductData', 'Transactions::viewProductData');
+$routes->post('transactions/sumTotal', 'Transactions::sumTotal');
+$routes->post('transactions/deleteItem', 'Transactions::deleteItem');
+$routes->post('transactions/cancel', 'Transactions::cancelTransaction');

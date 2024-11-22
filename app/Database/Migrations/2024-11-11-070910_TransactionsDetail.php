@@ -42,7 +42,7 @@ class TransactionsDetail extends Migration
                 'default'        => 0.00,
                 'null'           => false
             ],
-            'subtotal'           => [
+            'sub_total'           => [
                 'type'           => 'DOUBLE',
                 'constraint'     => '12,2',
                 'default'        => 0.00,

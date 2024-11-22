@@ -52,10 +52,10 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                 <div class="form-group">
                     <label for="tanggal">Action</label>
                     <div class="input-group">
-                        <button class="btn btn-danger" type="button" id="btnHapusTransaksi">
+                        <button class="btn btn-danger" type="button" id="deleteTransactions">
                             <i class="fa fa-trash-alt"></i>
                         </button>&nbsp;
-                        <button class="btn btn-success" type="button" id="btnSimpanTransaksi">
+                        <button class="btn btn-success" type="button" id="saveTransactions">
                             <i class="fa fa-save"></i>
                         </button>&nbsp;
                     </div>
@@ -103,6 +103,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
 <script>
     $(document).ready(function() {
         detailTransactionsData();
+        sumTotal();
 
         $('#barcode').keydown(function(e) {
             if (e.keyCode == 13) {
@@ -163,7 +164,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                 },
                 dataType: "json",
                 success: function(response) {
-                    if(response.Data == 'Many') {
+                    if (response.Data == 'Many') {
                         $.ajax({
                             url: "<?= site_url('transactions/viewProductData') ?>",
                             dataType: "json",
@@ -179,8 +180,19 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                                 alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
                             }
                         });
-                    } else {
-                        alert('1')
+                    }
+                    if (response.success == 'Success') {
+                        detailTransactionsData();
+                        empty();
+                    }
+                    if (response.error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            html: response.error
+                        });
+                        detailTransactionsData();
+                        empty();
                     }
                 },
                 error: function(xhr, thrownError) {
@@ -189,6 +201,80 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
             });
         }
     }
+
+    function empty() {
+        $('#barcode').val('');
+        $('#product').val('');
+        $('#qty').val('1');
+        $('#barcode').focus();
+
+        sumTotal();
+    }
+
+    function sumTotal() {
+        $.ajax({
+            url: "<?= site_url('transactions/sumTotal') ?>",
+            dataType: "json",
+            data: {
+                invoice: $('#invoice').val()
+            },
+            type: "post",
+            success: function(response) {
+                if (response.total) {
+                    $('#total').val(response.total);
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
+    }
+
+    $('#deleteTransactions').click(function(e) {
+        e.preventDefault();
+        let invoice = $('#invoice').val();
+        Swal.fire({
+            title: "Delete this Transaction?",
+            html: `Are you sure want to delete <strong>${invoice}</strong>`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "post",
+                    url: "<?= site_url('transactions/cancel') ?>",
+                    data: {
+                        invoice: invoice
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success == 'Success') {
+                            Swal.fire({
+                                title: "Success!",
+                                html: response.success,
+                                icon: "success"
+                            }).then((result) => {
+                                window.location.reload();
+                            });
+                        }
+                    },
+                    error: function(xhr, thrownError) {
+                        alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                    }
+                });
+            }
+        });
+
+        $('#saveTransactions').click(function (e) { 
+            e.preventDefault();
+            payment();
+        });
+    });
+
+    function
 </script>
 
 <?= $this->endSection() ?>

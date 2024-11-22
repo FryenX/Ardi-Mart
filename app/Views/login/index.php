@@ -113,7 +113,7 @@
                 },
                 complete: function() {
                     $('#login').prop('disabled', false)
-                    $('#login').html('Save')
+                    $('#login').html('Login')
                 },
                 success: function(response) {
                     if (response.error) {

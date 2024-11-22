@@ -17,7 +17,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <input type="text" name="keyword" id="keyword" value="<?= $keyword ?>">
+                <input type="hidden" name="keyword" id="keyword" value="<?= $keyword ?>">
                 <table id="productData" class="table table-bordered table-striped dataTable dtr-inline" style="width: 100%;">
                     <thead>
                         <tr>
