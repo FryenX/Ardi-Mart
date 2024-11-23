@@ -50,7 +50,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="tanggal">Action</label>
+                    <label>Action</label>
                     <div class="input-group">
                         <button class="btn btn-danger" type="button" id="deleteTransactions">
                             <i class="fa fa-trash-alt"></i>
@@ -99,6 +99,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
     </div>
 </div>
 <div id="viewModal" style="display: none;"></div>
+<div id="viewModalPayment" style="display: none;"></div>
 
 <script>
     $(document).ready(function() {
@@ -267,14 +268,41 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                 });
             }
         });
-
-        $('#saveTransactions').click(function (e) { 
-            e.preventDefault();
-            payment();
-        });
     });
 
-    function
+    $('#saveTransactions').click(function(e) {
+        e.preventDefault();
+        payment();
+    });
+
+    function payment() {
+        let invoice = $('#invoice').val();
+        $.ajax({
+            type: "post",
+            url: "<?= site_url('transactions/payment') ?>",
+            data: {
+                invoice: invoice,
+                date: $('#datetime').val(),
+                customer: $('#customer').val()
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.error) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Error",
+                        html: response.error
+                    });
+                } else if (response.data) {
+                    $('#viewModalPayment').html(response.data).show();
+                    $('#modalPayment').modal('show')
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
+    }
 </script>
 
 <?= $this->endSection() ?>

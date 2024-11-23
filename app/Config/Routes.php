@@ -80,3 +80,4 @@ $routes->post('transactions/viewProductData', 'Transactions::viewProductData');
 $routes->post('transactions/sumTotal', 'Transactions::sumTotal');
 $routes->post('transactions/deleteItem', 'Transactions::deleteItem');
 $routes->post('transactions/cancel', 'Transactions::cancelTransaction');
+$routes->post('transactions/payment', 'Transactions::payment');

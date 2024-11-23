@@ -46,6 +46,18 @@ class Transactions extends Migration
                 'default'        => 0.00,
                 'null'           => false
             ],
+            'payment_amount' => [
+                'type'           => 'DOUBLE',
+                'constraint'     => '12,2',
+                'default'        => 0.00,
+                'null'           => false
+            ],
+            'payment_change' => [
+                'type'           => 'DOUBLE',
+                'constraint'     => '12,2',
+                'default'        => 0.00,
+                'null'           => false
+            ]
         ]);
         $this->forge->addPrimaryKey('invoice');
         $this->forge->addForeignKey('customer_id', 'customers', 'id', 'CASCADE');

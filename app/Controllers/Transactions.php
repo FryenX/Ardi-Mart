@@ -217,4 +217,34 @@ class Transactions extends BaseController
             echo json_encode($msg);
         }
     }
+
+    public function payment()
+    {
+        if ($this->request->isAJAX())
+        {
+            $invoice = $this->request->getPost('invoice');
+            $invoiceDate = $this->request->getPost('datetime');
+            $customer = $this->request->getPost('customer');
+            $temp_transactions = $this->db->table('temp_transactions');
+            $query = $temp_transactions->getWhere(['invoice' => $invoice]);
+            $queryTotal = $temp_transactions->select('SUM(subtotal) AS net_total')->where('invoice', $invoice)->get();
+            $rowTotal = $queryTotal->getRowArray();
+            if($query->getNumRows() > 0 ) {
+                $data = [
+                    'invoice' => $invoice,
+                    'customer' => $customer,
+                    'total' => $rowTotal['net_total']
+                ];
+
+                $msg = [
+                    'data' => view('transactions/modalPayment', $data)
+                ];
+            } else {
+                $msg = [
+                    'error' => 'No Item Yet'
+                ];
+            }
+            echo json_encode($msg);
+        }
+    }
 }
