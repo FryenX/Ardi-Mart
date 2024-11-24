@@ -114,6 +114,25 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
         });
     })
 
+    function createInvoice() {
+        $.ajax({
+            type: "post",
+            url: "<?= site_url('transactions/createInvoice') ?>",
+            data: {
+                date: $('#date').val()
+            },
+            dataType: "dataType",
+            success: function (response) {
+                if(response.invoice) {
+                    $('#invoice').val(response.invoice);
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
+    }
+
     function detailTransactionsData() {
         $.ajax({
             type: "post",
@@ -231,8 +250,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
         });
     }
 
-    $('#deleteTransactions').click(function(e) {
-        e.preventDefault();
+    function cancelTransactions() {
         let invoice = $('#invoice').val();
         Swal.fire({
             title: "Delete this Transaction?",
@@ -268,11 +286,38 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                 });
             }
         });
+    }
+
+    $('#deleteTransactions').click(function(e) {
+        e.preventDefault();
+        cancelTransactions();
     });
 
     $('#saveTransactions').click(function(e) {
         e.preventDefault();
         payment();
+    });
+
+    $('#qty').click(function(e) {
+        if (e.keyCode == 27) {
+            e.preventDefault();
+            $('#barcode').focus();
+        }
+    });
+
+    $(this).keydown(function(e) {
+        if (e.keyCode == 27) {
+            e.preventDefault();
+            $('#barcode').focus();
+        }
+        if (e.keyCode == 115) {
+            e.preventDefault();
+            cancelTransactions();
+        }
+        if (e.keyCode == 119) {
+            e.preventDefault();
+            payment();
+        }
     });
 
     function payment() {
@@ -295,6 +340,9 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                     });
                 } else if (response.data) {
                     $('#viewModalPayment').html(response.data).show();
+                    $('#modalPayment').on('shown.bs.modal', function(event) {
+                        $('#payment').focus();
+                    })
                     $('#modalPayment').modal('show')
                 }
             },

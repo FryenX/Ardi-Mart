@@ -1,5 +1,5 @@
 <script src="<?= base_url('assets/plugins/autoNumeric.js') ?>"></script>
-<div class="modal fade" id="modalPayment" tabindex="-1" aria-labelledby="modalPaymentLabel" aria-hidden="true">
+<div class="modal fade" id="modalPayment" tabindex="-1" aria-labelledby="modalPaymentLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -45,19 +45,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success">Save</button>
+                <button type="submit" id="btnSave" class="btn btn-success">Save</button>
             </div>
             <?= form_close() ?>
         </div>
     </div>
 </div>
-
-<style>
-    .toast-title {
-        color: white;
-        font-weight: bold;
-    }
-</style>
 
 <script>
     $(document).ready(function() {
@@ -125,7 +118,43 @@
                     title: "The Payment Amount is Not Enough",
                 });
             } else {
-                
+                $.ajax({
+                    type: "post",
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    beforeSend: function() {
+                        $('#btnSave').prop('disabled', true)
+                        $('#btnSave').html('<i class="fa fa-spin fa-spinner"></i>')
+                    },
+                    complete: function() {
+                        $('#btnSave').prop('disabled', false)
+                        $('#btnSave').html('Save')
+                    },
+                    success: function(response) {
+                        if (response.success == 'Success') {
+                            Swal.fire({
+                                title: "Print Invoice?",
+                                text: "You won't be able to revert this!",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#3085d6",
+                                cancelButtonColor: "#d33",
+                                confirmButtonText: "Yes, Print!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    alert('printed');
+                                    window.location.reload();
+                                } else {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr, thrownError) {
+                        alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                    }
+                });
             }
             return false
         });

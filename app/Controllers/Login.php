@@ -79,8 +79,8 @@ class Login extends BaseController
                     ]);
 
                     if ($rememberMe == '1') {
-                        $this->response->setCookie('username', $username, time() + 60 * 60 * 24 * 30, '/');
-                        $this->response->setCookie('password',  $password, time() + 60 * 60 * 24 * 30, '/');
+                        $this->response->setCookie('username', $username, time() + 60 * 60 * 24 * 30, '/', '');
+                        $this->response->setCookie('password', $password, time() + 60 * 60 * 24 * 30, '/', '');                        
                     }
 
                     $msg = ['success' => 'Login Successful'];

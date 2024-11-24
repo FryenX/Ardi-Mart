@@ -115,4 +115,5 @@ class Categories extends BaseController
             echo json_encode($msg);
         }
     }
+
 }

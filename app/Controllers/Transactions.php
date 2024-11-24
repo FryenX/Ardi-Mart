@@ -26,27 +26,18 @@ class Transactions extends BaseController
         $session = session();
         $uuid = $session->get('uuid');
         $userId = substr($uuid, -3);
-
         $date = $this->request->getPost('date');
-
         $query = $this->db->query("
         SELECT MAX(invoice) AS noInvoice 
         FROM transactions 
-        WHERE DATE_FORMAT(date_time, '%Y-%m-%d') = '$date' 
-        AND invoice LIKE 'T" . date('dmy') . "%' 
-        AND invoice LIKE '%U" . sprintf('%03s', $userId) . "'
-        ");
+        WHERE DATE(date_time) = '$date'");
         $result = $query->getRowArray();
-
         $data = $result['noInvoice'];
-
-        $lastNum = $data ? substr($data, -4) : 0;
-
+        $lastNum = substr($data, -4);
         $nextNum = intval($lastNum) + 1;
-
         $invoice = 'T' . date('dmy') . sprintf('%05s', $nextNum) . 'U' . sprintf('%03s', $userId);
-
-        return $invoice;
+        $msg = ['invoice' => $invoice ];
+        echo json_encode($msg);
     }
 
 
@@ -247,4 +238,64 @@ class Transactions extends BaseController
             echo json_encode($msg);
         }
     }
+
+    public function saveData()
+{
+    if ($this->request->isAJAX())
+    {
+        $invoice = $this->request->getPost('invoice');
+        $customer = $this->request->getPost('customer');
+        $gross_total = $this->request->getPost('gross_total');
+        $net_total = str_replace(",", "", $this->request->getPost('net_total'));
+        $disc_percent = str_replace(",", "", $this->request->getPost('disc_percent'));
+        $disc_idr = str_replace(",", "", $this->request->getPost('disc_idr'));
+        $payment = str_replace(",", "", $this->request->getPost('payment'));
+        $change = str_replace(",", "", $this->request->getPost('change'));
+
+        $transactions = $this->db->table('transactions');
+        $temp_transactions = $this->db->table('temp_transactions');
+        $detail_transactions = $this->db->table('transactions_detail');
+
+        $insertTransactionsData = [
+            'invoice' => $invoice,
+            'date_time' => date('Y-m-d H:i:s'),
+            'customer_id' => $customer,
+            'discount_percent' => $disc_percent,
+            'discount_idr' => $disc_idr,
+            'gross_total' => $gross_total,
+            'net_total' => $net_total,
+            'payment_amount' => $payment,
+            'payment_change' => $change,
+        ];
+
+        $transactions->insert($insertTransactionsData);
+
+        $fetchTempData = $temp_transactions->getWhere(['invoice' => $invoice]);
+        $fieldDetailTransactions = [];
+
+        foreach ($fetchTempData->getResultArray() as $row) {
+            $fieldDetailTransactions[] = [
+                'invoice' => $row['invoice'],
+                'barcode' => $row['barcode'],
+                'purchase_price' => $row['purchase_price'],
+                'sell_price' => $row['sell_price'],
+                'qty' => $row['qty'],
+                'sub_total' => $row['subtotal'],
+            ];
+        }
+
+        if (!empty($fieldDetailTransactions)) {
+            $detail_transactions->insertBatch($fieldDetailTransactions);
+        }
+
+        $temp_transactions->where('invoice', $invoice)->delete();
+
+        $msg = [
+            'success' => 'Success',
+        ];
+
+        echo json_encode($msg);
+    }
+}
+
 }

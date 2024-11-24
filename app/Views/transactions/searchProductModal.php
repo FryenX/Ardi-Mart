@@ -70,6 +70,7 @@
         $('#product').val(name);
         $('#productModal').on('hidden.bs.modal', function(event) {
             $('#barcode').focus();
+            checkCode();
         })
         $('#productModal').modal('hide')
     }
