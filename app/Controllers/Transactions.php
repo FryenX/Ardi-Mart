@@ -5,6 +5,9 @@ namespace App\Controllers;
 
 use App\Models\productsDataModel;
 use Config\Services;
+use Escpos\PrintConnectors\WindowsPrintConnector;
+use Escpos\CapabilityProfile;
+use Escpos\Printer;
 
 class Transactions extends BaseController
 {
@@ -15,10 +18,7 @@ class Transactions extends BaseController
 
     public function input()
     {
-        $data = [
-            'invoice' => $this->createInvoice()
-        ];
-        return view('transactions/input', $data);
+        return view('transactions/input');
     }
 
     public function createInvoice()
@@ -27,16 +27,24 @@ class Transactions extends BaseController
         $uuid = $session->get('uuid');
         $userId = substr($uuid, -3);
         $date = $this->request->getPost('date');
+
         $query = $this->db->query("
         SELECT MAX(invoice) AS noInvoice 
         FROM transactions 
-        WHERE DATE(date_time) = '$date'");
+        WHERE DATE_FORMAT(date_time, '%Y-%m-%d') = '$date'");
         $result = $query->getRowArray();
         $data = $result['noInvoice'];
-        $lastNum = substr($data, -4);
-        $nextNum = intval($lastNum) + 1;
-        $invoice = 'T' . date('dmy') . sprintf('%05s', $nextNum) . 'U' . sprintf('%03s', $userId);
-        $msg = ['invoice' => $invoice ];
+
+        if ($data) {
+            $lastNum = substr($data, -8, 4);
+            $nextNum = intval($lastNum) + 1;
+        } else {
+            $nextNum = 1;
+        }
+
+        $formattedDate = date('dmy', strtotime($date));
+        $invoice = 'T' . $formattedDate . sprintf('%04s', $nextNum) . 'U' . sprintf('%03s', $userId);
+        $msg = ['invoice' => $invoice];
         echo json_encode($msg);
     }
 
@@ -211,8 +219,7 @@ class Transactions extends BaseController
 
     public function payment()
     {
-        if ($this->request->isAJAX())
-        {
+        if ($this->request->isAJAX()) {
             $invoice = $this->request->getPost('invoice');
             $invoiceDate = $this->request->getPost('datetime');
             $customer = $this->request->getPost('customer');
@@ -220,7 +227,7 @@ class Transactions extends BaseController
             $query = $temp_transactions->getWhere(['invoice' => $invoice]);
             $queryTotal = $temp_transactions->select('SUM(subtotal) AS net_total')->where('invoice', $invoice)->get();
             $rowTotal = $queryTotal->getRowArray();
-            if($query->getNumRows() > 0 ) {
+            if ($query->getNumRows() > 0) {
                 $data = [
                     'invoice' => $invoice,
                     'customer' => $customer,
@@ -240,62 +247,72 @@ class Transactions extends BaseController
     }
 
     public function saveData()
-{
-    if ($this->request->isAJAX())
     {
-        $invoice = $this->request->getPost('invoice');
-        $customer = $this->request->getPost('customer');
-        $gross_total = $this->request->getPost('gross_total');
-        $net_total = str_replace(",", "", $this->request->getPost('net_total'));
-        $disc_percent = str_replace(",", "", $this->request->getPost('disc_percent'));
-        $disc_idr = str_replace(",", "", $this->request->getPost('disc_idr'));
-        $payment = str_replace(",", "", $this->request->getPost('payment'));
-        $change = str_replace(",", "", $this->request->getPost('change'));
+        if ($this->request->isAJAX()) {
+            $invoice = $this->request->getPost('invoice');
+            $customer = $this->request->getPost('customer');
+            $gross_total = $this->request->getPost('gross_total');
+            $net_total = str_replace(",", "", $this->request->getPost('net_total'));
+            $disc_percent = str_replace(",", "", $this->request->getPost('disc_percent'));
+            $disc_idr = str_replace(",", "", $this->request->getPost('disc_idr'));
+            $payment = str_replace(",", "", $this->request->getPost('payment'));
+            $change = str_replace(",", "", $this->request->getPost('change'));
 
-        $transactions = $this->db->table('transactions');
-        $temp_transactions = $this->db->table('temp_transactions');
-        $detail_transactions = $this->db->table('transactions_detail');
+            $transactions = $this->db->table('transactions');
+            $temp_transactions = $this->db->table('temp_transactions');
+            $detail_transactions = $this->db->table('transactions_detail');
 
-        $insertTransactionsData = [
-            'invoice' => $invoice,
-            'date_time' => date('Y-m-d H:i:s'),
-            'customer_id' => $customer,
-            'discount_percent' => $disc_percent,
-            'discount_idr' => $disc_idr,
-            'gross_total' => $gross_total,
-            'net_total' => $net_total,
-            'payment_amount' => $payment,
-            'payment_change' => $change,
-        ];
-
-        $transactions->insert($insertTransactionsData);
-
-        $fetchTempData = $temp_transactions->getWhere(['invoice' => $invoice]);
-        $fieldDetailTransactions = [];
-
-        foreach ($fetchTempData->getResultArray() as $row) {
-            $fieldDetailTransactions[] = [
-                'invoice' => $row['invoice'],
-                'barcode' => $row['barcode'],
-                'purchase_price' => $row['purchase_price'],
-                'sell_price' => $row['sell_price'],
-                'qty' => $row['qty'],
-                'sub_total' => $row['subtotal'],
+            $insertTransactionsData = [
+                'invoice' => $invoice,
+                'date_time' => date('Y-m-d H:i:s'),
+                'customer_id' => $customer,
+                'discount_percent' => $disc_percent,
+                'discount_idr' => $disc_idr,
+                'gross_total' => $gross_total,
+                'net_total' => $net_total,
+                'payment_amount' => $payment,
+                'payment_change' => $change,
             ];
+
+            $transactions->insert($insertTransactionsData);
+
+            $fetchTempData = $temp_transactions->getWhere(['invoice' => $invoice]);
+            $fieldDetailTransactions = [];
+
+            foreach ($fetchTempData->getResultArray() as $row) {
+                $fieldDetailTransactions[] = [
+                    'invoice' => $row['invoice'],
+                    'barcode' => $row['barcode'],
+                    'purchase_price' => $row['purchase_price'],
+                    'sell_price' => $row['sell_price'],
+                    'qty' => $row['qty'],
+                    'sub_total' => $row['subtotal'],
+                ];
+            }
+
+            if (!empty($fieldDetailTransactions)) {
+                $detail_transactions->insertBatch($fieldDetailTransactions);
+            }
+
+            $temp_transactions->where('invoice', $invoice)->delete();
+
+            $msg = [
+                'success' => 'Success',
+            ];
+
+            echo json_encode($msg);
         }
-
-        if (!empty($fieldDetailTransactions)) {
-            $detail_transactions->insertBatch($fieldDetailTransactions);
-        }
-
-        $temp_transactions->where('invoice', $invoice)->delete();
-
-        $msg = [
-            'success' => 'Success',
-        ];
-
-        echo json_encode($msg);
     }
-}
 
+    public function printInvoice()
+    {
+        $profile = CapabilityProfile::load("simple");
+        $connector = new WindowsPrintConnector("printer_ardi");
+        $printer = new Printer($connector, $profile);
+
+        $printer->text('Hello World');
+        $printer->feed(4);
+        $printer->cut();
+        $printer->close();
+    }
 }

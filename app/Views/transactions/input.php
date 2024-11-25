@@ -5,11 +5,6 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('content') ?>
-<?php
-$date = new DateTime('now', new DateTimeZone('UTC'));
-$date->setTimezone(new DateTimeZone('Asia/Singapore'));
-$currentDateTime = $date->format('Y-m-d\TH:i');
-?>
 <div class="card card-default color-palette-box">
     <div class="card-header">
         <h3 class="card-title">
@@ -23,14 +18,14 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
                 <div class="form-group">
                     <label for="invoice">Invoice</label>
                     <input type="text" class="form-control form-control-sm" style="color:red;font-weight:bold;"
-                        name="invoice" value="<?= $invoice ?>" id="invoice" readonly>
+                        name="invoice" id="invoice" readonly>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="datetime">Date</label>
-                    <input type="datetime-local" class="form-control form-control-sm" name="datetime" id="datetime" readonly
-                        value="<?= $currentDateTime; ?>">
+                    <label for="date">Date</label>
+                    <input type="date" class="form-control form-control-sm" name="date" id="date" readonly
+                        value="<?= date('Y-m-d'); ?>">
                 </div>
             </div>
             <div class="col-md-3">
@@ -103,10 +98,18 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
 
 <script>
     $(document).ready(function() {
+        createInvoice();
         detailTransactionsData();
         sumTotal();
 
         $('#barcode').keydown(function(e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                checkCode();
+            }
+        });
+
+        $('#qty').keydown(function(e) {
             if (e.keyCode == 13) {
                 e.preventDefault();
                 checkCode();
@@ -121,7 +124,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
             data: {
                 date: $('#date').val()
             },
-            dataType: "dataType",
+            dataType: "json",
             success: function (response) {
                 if(response.invoice) {
                     $('#invoice').val(response.invoice);
@@ -327,7 +330,7 @@ $currentDateTime = $date->format('Y-m-d\TH:i');
             url: "<?= site_url('transactions/payment') ?>",
             data: {
                 invoice: invoice,
-                date: $('#datetime').val(),
+                date: $('#date').val(),
                 customer: $('#customer').val()
             },
             dataType: "json",

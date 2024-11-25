@@ -115,6 +115,12 @@ class Filters extends BaseFilters
                 'users/*',
                 'levels',
                 'levels/*',
+                'categories',
+                'catregories/*',
+                'units',
+                'units/*',
+                'products',
+                'products/*',
             ]
         ],
     ];

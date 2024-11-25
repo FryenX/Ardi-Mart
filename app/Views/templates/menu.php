@@ -5,15 +5,18 @@
 <?php
 $userLevel = session()->get('level_info');
 ?>
-
-<li class="nav-item">
-    <a href="<?= site_url('/') ?>" class="nav-link">
-        <i class="nav-icon fa fa-tachometer-alt"></i>
-        <p>
-            Dashboard
-        </p>
-    </a>
-</li>
+<?php
+if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+echo "<li class='nav-item'>
+    <a href='" . site_url('/') . "' class='nav-link'>
+        <i class='nav-icon fa fa-tachometer-alt'></i>
+            <p>
+                Dashboard
+            </p>
+        </a>
+    </li>";
+}
+?>
 <li class="nav-header">Master</li>
 <?php
 if ($userLevel == 'Admin' || $userLevel == 'Manager') {
@@ -27,32 +30,44 @@ if ($userLevel == 'Admin' || $userLevel == 'Manager') {
         </li>";
 }
 ?>
-<li class="nav-item">
-    <a href="<?= site_url('categories') ?>" class="nav-link">
-        <i class="nav-icon fa fa-list"></i>
+<?php
+if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+echo "<li class='nav-item'>
+    <a href='" . site_url('categories') . "' class='nav-link'>
+        <i class='nav-icon fa fa-list'></i>
         <p>
             Categories
         </p>
     </a>
-</li>
-<li class="nav-item">
-    <a href="<?= site_url('units') ?>" class="nav-link">
-        <i class="nav-icon fa fa-list"></i>
+</li>";
+}
+?>
+<?php
+if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+echo "<li class='nav-item'>
+    <a href='" . site_url('units') . "' class='nav-link'>
+        <i class='nav-icon fa fa-list'></i>
         <p>
             Units
         </p>
     </a>
-</li>
-<li class="nav-item">
-    <a href="<?= site_url('products') ?>" class="nav-link">
-        <i class="nav-icon fa fa-table"></i>
-        <p>
-            Products
-        </p>
-    </a>
-</li>
+</li>";
+}
+?>
 <?php
 if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+    echo "<li class='nav-item'>
+        <a href='" . site_url('products') . "' class='nav-link'>
+            <i class='nav-icon fa fa-table'></i>
+            <p>
+                Products
+            </p>
+        </a>
+    </li>";
+}
+?>
+<?php
+if ($userLevel == 'Admin') {
     echo "<li class='nav-item'>
         <a href='" . site_url('levels') . "' class='nav-link'>
         <i class='nav-icon fa fa-share'></i> 

@@ -5,7 +5,9 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Templates::index');
+$routes->get('/', 'Main::index');
+$routes->post('main/userRegis', 'Main::userRegis');
+$routes->post('main/newTransactions', 'Main::newTransactions');
 $routes->get('/restricted', 'restricted::index');
 
 // Login 
