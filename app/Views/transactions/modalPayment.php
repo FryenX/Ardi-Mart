@@ -12,7 +12,7 @@
             <div class="modal-body">
                 <input type="hidden" name="invoice" value="<?= $invoice ?>">
                 <input type="hidden" name="customer" value="<?= $customer ?>">
-                <input type="hidden" name="gross_total" id="gross_total" value="<?= $total ?>">
+                <input type="hidden" name="gross_total" id="gross_total" value="<?= $net_total ?>">
                 <div class="row">
                     <div class="col">
                         <div class="form-group">
@@ -28,9 +28,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="total">Total Payment</label>
-                    <input type="text" class="form-control form-control-lg" name="total" id="net_total"
-                        style="text-align: right; color:blue; font-weight : bold; font-size:30pt;" value="<?= $total ?>" readonly>
+                    <label for="net_total">Total Payment</label>
+                    <input type="text" class="form-control form-control-lg" name="net_total" id="net_total"
+                        style="text-align: right; color:blue; font-weight : bold; font-size:30pt;" value="<?= $net_total ?>" readonly>
                 </div>
                 <div class="form-group">
                     <label for="payment">Payment</label>
@@ -143,8 +143,20 @@
                                 confirmButtonText: "Yes, Print!"
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    alert('printed');
-                                    window.location.reload();
+                                    $.ajax({
+                                        type: "post",
+                                        url: "<?= site_url('transactions/printInvoice') ?>",
+                                        data: {
+                                            invoice: response.invoice
+                                        },
+                                        success: function(response) {
+                                            alert(response);
+                                            window.location.reload();
+                                        },
+                                        error: function(xhr, thrownError) {
+                                            alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                                        }
+                                    });
                                 } else {
                                     window.location.reload();
                                 }

@@ -17,7 +17,12 @@ echo "<li class='nav-item'>
     </li>";
 }
 ?>
-<li class="nav-header">Master</li>
+<?php
+    if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+        echo "<li class='nav-header'>Master</li>";
+    }
+?>
+
 <?php
 if ($userLevel == 'Admin' || $userLevel == 'Manager') {
     echo "<li class='nav-item'>

@@ -42,7 +42,7 @@ class Autoload extends AutoloadConfig
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
         'Config' => APPPATH . 'Config',
-        'Escpos' => ROOTPATH . 'vendor/mike42/escpos-php/src/Escpos',
+        'Escpos' => APPPATH . 'ThirdParty/Mike42/Escpos',
     ];
 
     /**

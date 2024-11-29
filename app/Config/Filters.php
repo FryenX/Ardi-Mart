@@ -111,6 +111,7 @@ class Filters extends BaseFilters
     public array $filters = [
         'userLevel' => [
             'before' => [
+                '/',
                 'users',
                 'users/*',
                 'levels',

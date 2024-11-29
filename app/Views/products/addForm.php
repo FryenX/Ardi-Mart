@@ -132,6 +132,12 @@
 <div id="viewModal" style="display: none;"></div>
 
 <script>
+    $('#barcode').keydown(function(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+        }
+    });
+
     $('#purchase_price').autoNumeric('init', {
         aSep: ',',
         aDec: '.',

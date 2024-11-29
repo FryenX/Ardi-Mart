@@ -6,8 +6,9 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Main::index');
-$routes->post('main/userRegis', 'Main::userRegis');
-$routes->post('main/newTransactions', 'Main::newTransactions');
+$routes->post('main/fetchSalesData', 'Main::fetchSalesData');
+$routes->get('main/fetchSaleYears', 'Main::fetchSaleYears');
+$routes->get('main/fetchMonthlySales/(:any)', 'Main::fetchSalesData/$1');
 $routes->get('/restricted', 'restricted::index');
 
 // Login 
@@ -84,3 +85,5 @@ $routes->post('transactions/deleteItem', 'Transactions::deleteItem');
 $routes->post('transactions/cancel', 'Transactions::cancelTransaction');
 $routes->post('transactions/payment', 'Transactions::payment');
 $routes->post('transactions/saveData', 'Transactions::saveData');
+$routes->get('transactions/printInvoice', 'Transactions::printInvoice');
+$routes->post('transactions/printInvoice', 'Transactions::printInvoice');

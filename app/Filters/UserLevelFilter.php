@@ -13,7 +13,13 @@ class UserLevelFilter implements FilterInterface
         $userLevel = session()->get('level_info');
 
         if ($userLevel !== 'Admin' && $userLevel !== 'Manager') {
-            return redirect()->to('/restricted');
+            if (current_url() === base_url('/')) {
+                if ($userLevel === 'Cashier') {
+                    return redirect()->to('/transactions');
+                }
+
+                return redirect()->to('/restricted');
+            }
         }
     }
 

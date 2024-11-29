@@ -75,7 +75,7 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="qty">Quantity</label>
-                    <input type="number" class="form-control form-control-sm" name="qty" id="qty" value="1">
+                    <input type="number" class="form-control form-control-sm" name="qty" id="qty" value="1" min="1">
                 </div>
             </div>
             <div class="col-md-3">
@@ -99,13 +99,14 @@
 <script>
     $(document).ready(function() {
         createInvoice();
-        detailTransactionsData();
         sumTotal();
+        detailTransactionsData();
 
         $('#barcode').keydown(function(e) {
             if (e.keyCode == 13) {
                 e.preventDefault();
                 checkCode();
+                $('#qty').focus().select();
             }
         });
 
@@ -114,6 +115,13 @@
                 e.preventDefault();
                 checkCode();
             }
+        });
+
+        $('#qty').autoNumeric('init', {
+            aSep: ',',
+            aDec: '.',
+            mDec: '2',
+            vMin: '1',
         });
     })
 

@@ -5,9 +5,9 @@ namespace App\Controllers;
 
 use App\Models\productsDataModel;
 use Config\Services;
-use Escpos\PrintConnectors\WindowsPrintConnector;
-use Escpos\CapabilityProfile;
-use Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\CapabilityProfile;
+use Mike42\Escpos\Printer;
 
 class Transactions extends BaseController
 {
@@ -56,7 +56,7 @@ class Transactions extends BaseController
         $tempTransactions = $this->db->table('temp_transactions');
         $query = $tempTransactions->select('temp_transactions.id AS id, temp_transactions.barcode AS barcode, 
         products.name AS product, temp_transactions.sell_price AS sell_price, temp_transactions.qty AS qty, temp_transactions.subtotal AS sub_total')
-            ->join('products', 'temp_transactions.barcode = products.barcode')->where('temp_transactions.invoice', $noInvoice)
+            ->join('products', 'temp_transactions.barcode = products.barcode')->like('temp_transactions.invoice', $noInvoice)
             ->orderBy('temp_transactions.id', 'ASC');
 
         $data = [
@@ -175,11 +175,11 @@ class Transactions extends BaseController
         if ($this->request->isAJAX()) {
             $invoice = $this->request->getPost('invoice');
             $temp_transactions = $this->db->table('temp_transactions');
-            $query = $temp_transactions->select('SUM(subtotal) AS net_total')->where('invoice', $invoice)->get();
+            $query = $temp_transactions->select('SUM(subtotal) AS total')->where('invoice', $invoice)->get();
             $row = $query->getRowArray();
 
             $msg = [
-                'total' => number_format($row['net_total'], '0', ",", ".")
+                'total' => number_format($row['total'], '0', ",", ".")
             ];
             echo json_encode($msg);
         }
@@ -231,7 +231,7 @@ class Transactions extends BaseController
                 $data = [
                     'invoice' => $invoice,
                     'customer' => $customer,
-                    'total' => $rowTotal['net_total']
+                    'net_total' => $rowTotal['net_total']
                 ];
 
                 $msg = [
@@ -298,6 +298,7 @@ class Transactions extends BaseController
 
             $msg = [
                 'success' => 'Success',
+                'invoice' => $invoice
             ];
 
             echo json_encode($msg);
@@ -306,13 +307,126 @@ class Transactions extends BaseController
 
     public function printInvoice()
     {
+        function buatBaris1Kolom($kolom1)
+        {
+            // Mengatur lebar setiap kolom (dalam satuan karakter)
+            $lebar_kolom_1 = 30;
+
+            // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+            $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+
+            // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+            $kolom1Array = explode("\n", $kolom1);
+
+            // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+            $jmlBarisTerbanyak = count($kolom1Array);
+
+            // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+            $hasilBaris = array();
+
+            // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+            for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+
+                // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+
+                // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+                $hasilBaris[] = $hasilKolom1;
+            }
+
+            // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+            return implode("\n", $hasilBaris) . "\n";
+        }
+
+        function buatBaris3Kolom($kolom1, $kolom2, $kolom3)
+        {
+            // Mengatur lebar setiap kolom (dalam satuan karakter)
+            $lebar_kolom_1 = 8;
+            $lebar_kolom_2 = 6;
+            $lebar_kolom_3 = 8;
+
+            // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+            $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+            $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+            $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+
+            // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+            $kolom1Array = explode("\n", $kolom1);
+            $kolom2Array = explode("\n", $kolom2);
+            $kolom3Array = explode("\n", $kolom3);
+
+            // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+            $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+
+            // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+            $hasilBaris = array();
+
+            // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+            for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+
+                // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                // memberikan rata kanan pada kolom 3 dan 4 karena akan kita gunakan untuk harga dan total harga
+                $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ", STR_PAD_LEFT);
+
+                $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+
+                // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+                $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
+            }
+
+            // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+            return implode("\n", $hasilBaris) . "\n";
+
+        }
+
         $profile = CapabilityProfile::load("simple");
-        $connector = new WindowsPrintConnector("printer_ardi");
+        $connector = new WindowsPrintConnector("printer_kasir");
         $printer = new Printer($connector, $profile);
 
-        $printer->text('Hello World');
+        $invoice = $this->request->getPost('invoice');
+        $transactions = $this->db->table('transactions');
+        $transactions_detail = $this->db->table('transactions_detail');
+
+        $query_transactions = $transactions->getWhere(['invoice' => $invoice]);
+        $row_transactions = $query_transactions->getRowArray();
+
+        $printer->initialize();
+        $printer->selectPrintMode(Printer::MODE_FONT_A);
+        $printer->text(buatBaris1Kolom("Ardi Mart"));
+        $printer->text(buatBaris1Kolom("Tabanan, Telp 085738754536"));
+        $printer->text(buatBaris1Kolom("Invoice: $invoice"));
+        $printer->text(buatBaris1Kolom("Date: $row_transactions[date_time]"));
+
+        $printer->text(buatBaris1Kolom("------------------------------"));
+
+        $query_transactions_detail = $transactions_detail
+            ->select('products.name as product, qty, units.name as unit, transactions_detail.sell_price AS sell_price, transactions_detail.sub_total AS sub_total')
+            ->join('products', 'transactions_detail.barcode = products.barcode')
+            ->join('units', 'units.id = products.unit_id')
+            ->where('transactions_detail.invoice', $invoice)->get();
+
+        $net_total = 0;
+
+        foreach ($query_transactions_detail->getResultArray() as $data) {
+            $printer->text(buatBaris1Kolom("$data[product]"));
+            $printer->text(buatBaris3Kolom(
+                number_format($data['qty'], 0) . ' ' . $data['unit'],
+                number_format($data['sell_price'], 0),
+                number_format($data['sub_total'], 0)
+            ));
+
+            $net_total += $data['sub_total'];
+        }
+
+        $printer->text(buatBaris1Kolom("------------------------------"));
+        $printer->text(buatBaris3Kolom("", "TOTAL: ", number_format($net_total, 0)));
+        $printer->text("\n");
+        $printer->text("Thanks For Your Visit");
+
         $printer->feed(4);
         $printer->cut();
+        echo "Invoice Printed Successfully";
         $printer->close();
     }
 }
