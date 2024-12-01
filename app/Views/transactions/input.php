@@ -5,6 +5,7 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('content') ?>
+<script src="<?= base_url('assets/plugins/autoNumeric.js') ?>"></script>
 <div class="card card-default color-palette-box">
     <div class="card-header">
         <h3 class="card-title">
