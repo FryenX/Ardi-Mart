@@ -57,7 +57,7 @@
             <div class="icon">
                 <i class="ion ion-pricetags"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="<?= base_url('products') ?>" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 </div>
@@ -65,28 +65,20 @@
 <div class="row">
     <div class="col-lg-7 connectedSortable ui-sortable">
         <div class="card">
-            <div class="card-header ui-sortable-handle" style="cursor: move;">
-                <h1 class="card-title" style="font-size: 24px">
+            <div class="card-header ui-sortable-handle bg-primary" style="cursor: move;">
+                <h1 class="card-title d-flex" style="font-size: 28px;">
                     <i class="fas fa-chart-pie mr-1"></i>
                     Sales
                 </h1>
                 <div class="card-tools">
-                    <select class="custom-select" style="height: 40px; line-height: 20px;" id="year" name="year">
+                    <select class="custom-select" style="height: 30px; line-height: 15px;" id="year" name="year">
                     </select>
                 </div>
             </div>
             <div class="card-body">
                 <div class="tab-content p-0">
-                    <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;">
-                        <div class="chartjs-size-monitor">
-                            <div class="chartjs-size-monitor-expand">
-                                <div class=""></div>
-                            </div>
-                            <div class="chartjs-size-monitor-shrink">
-                                <div class=""></div>
-                            </div>
-                        </div>
-                        <canvas id="sales-chart" height="300" style="height: 300px; display: block; width: 588px;" width="588" class="chartjs-render-monitor"></canvas>
+                    <div class="chart tab-pane active" id="sales-chart" style="position: relative; ">
+
                     </div>
                 </div>
             </div>
@@ -100,7 +92,9 @@
                     <i class="far fa-calendar-alt"></i>
                     Calendar
                 </h3>
+                <!-- tools card -->
                 <div class="card-tools">
+                    <!-- button with a dropdown -->
                     <div class="btn-group">
                         <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown" data-offset="-52">
                             <i class="fas fa-bars"></i>
@@ -119,8 +113,11 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
+                <!-- /. tools -->
             </div>
+            <!-- /.card-header -->
             <div class="card-body pt-0">
+                <!--The calendar -->
                 <div id="calendar" style="width: 100%">
                     <div class="bootstrap-datetimepicker-widget usetwentyfour">
                         <ul class="list-unstyled">
@@ -131,7 +128,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="prev" data-action="previous"><span class="fa fa-chevron-left" title="Previous Month"></span></th>
-                                                    <th class="picker-switch" data-action="pickerSwitch" colspan="5" title="Select Month">November 2024</th>
+                                                    <th class="picker-switch" data-action="pickerSwitch" colspan="5" title="Select Month">December 2024</th>
                                                     <th class="next" data-action="next"><span class="fa fa-chevron-right" title="Next Month"></span></th>
                                                 </tr>
                                                 <tr>
@@ -146,58 +143,58 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td data-action="selectDay" data-day="10/27/2024" class="day old weekend">27</td>
-                                                    <td data-action="selectDay" data-day="10/28/2024" class="day old">28</td>
-                                                    <td data-action="selectDay" data-day="10/29/2024" class="day old">29</td>
-                                                    <td data-action="selectDay" data-day="10/30/2024" class="day old">30</td>
-                                                    <td data-action="selectDay" data-day="10/31/2024" class="day old">31</td>
-                                                    <td data-action="selectDay" data-day="11/01/2024" class="day">1</td>
-                                                    <td data-action="selectDay" data-day="11/02/2024" class="day weekend">2</td>
+                                                    <td data-action="selectDay" data-day="12/01/2024" class="day weekend">1</td>
+                                                    <td data-action="selectDay" data-day="12/02/2024" class="day active today">2</td>
+                                                    <td data-action="selectDay" data-day="12/03/2024" class="day">3</td>
+                                                    <td data-action="selectDay" data-day="12/04/2024" class="day">4</td>
+                                                    <td data-action="selectDay" data-day="12/05/2024" class="day">5</td>
+                                                    <td data-action="selectDay" data-day="12/06/2024" class="day">6</td>
+                                                    <td data-action="selectDay" data-day="12/07/2024" class="day weekend">7</td>
                                                 </tr>
                                                 <tr>
-                                                    <td data-action="selectDay" data-day="11/03/2024" class="day weekend">3</td>
-                                                    <td data-action="selectDay" data-day="11/04/2024" class="day">4</td>
-                                                    <td data-action="selectDay" data-day="11/05/2024" class="day">5</td>
-                                                    <td data-action="selectDay" data-day="11/06/2024" class="day">6</td>
-                                                    <td data-action="selectDay" data-day="11/07/2024" class="day">7</td>
-                                                    <td data-action="selectDay" data-day="11/08/2024" class="day">8</td>
-                                                    <td data-action="selectDay" data-day="11/09/2024" class="day weekend">9</td>
+                                                    <td data-action="selectDay" data-day="12/08/2024" class="day weekend">8</td>
+                                                    <td data-action="selectDay" data-day="12/09/2024" class="day">9</td>
+                                                    <td data-action="selectDay" data-day="12/10/2024" class="day">10</td>
+                                                    <td data-action="selectDay" data-day="12/11/2024" class="day">11</td>
+                                                    <td data-action="selectDay" data-day="12/12/2024" class="day">12</td>
+                                                    <td data-action="selectDay" data-day="12/13/2024" class="day">13</td>
+                                                    <td data-action="selectDay" data-day="12/14/2024" class="day weekend">14</td>
                                                 </tr>
                                                 <tr>
-                                                    <td data-action="selectDay" data-day="11/10/2024" class="day weekend">10</td>
-                                                    <td data-action="selectDay" data-day="11/11/2024" class="day">11</td>
-                                                    <td data-action="selectDay" data-day="11/12/2024" class="day">12</td>
-                                                    <td data-action="selectDay" data-day="11/13/2024" class="day">13</td>
-                                                    <td data-action="selectDay" data-day="11/14/2024" class="day">14</td>
-                                                    <td data-action="selectDay" data-day="11/15/2024" class="day">15</td>
-                                                    <td data-action="selectDay" data-day="11/16/2024" class="day weekend">16</td>
+                                                    <td data-action="selectDay" data-day="12/15/2024" class="day weekend">15</td>
+                                                    <td data-action="selectDay" data-day="12/16/2024" class="day">16</td>
+                                                    <td data-action="selectDay" data-day="12/17/2024" class="day">17</td>
+                                                    <td data-action="selectDay" data-day="12/18/2024" class="day">18</td>
+                                                    <td data-action="selectDay" data-day="12/19/2024" class="day">19</td>
+                                                    <td data-action="selectDay" data-day="12/20/2024" class="day">20</td>
+                                                    <td data-action="selectDay" data-day="12/21/2024" class="day weekend">21</td>
                                                 </tr>
                                                 <tr>
-                                                    <td data-action="selectDay" data-day="11/17/2024" class="day weekend">17</td>
-                                                    <td data-action="selectDay" data-day="11/18/2024" class="day">18</td>
-                                                    <td data-action="selectDay" data-day="11/19/2024" class="day">19</td>
-                                                    <td data-action="selectDay" data-day="11/20/2024" class="day">20</td>
-                                                    <td data-action="selectDay" data-day="11/21/2024" class="day">21</td>
-                                                    <td data-action="selectDay" data-day="11/22/2024" class="day">22</td>
-                                                    <td data-action="selectDay" data-day="11/23/2024" class="day weekend">23</td>
+                                                    <td data-action="selectDay" data-day="12/22/2024" class="day weekend">22</td>
+                                                    <td data-action="selectDay" data-day="12/23/2024" class="day">23</td>
+                                                    <td data-action="selectDay" data-day="12/24/2024" class="day">24</td>
+                                                    <td data-action="selectDay" data-day="12/25/2024" class="day">25</td>
+                                                    <td data-action="selectDay" data-day="12/26/2024" class="day">26</td>
+                                                    <td data-action="selectDay" data-day="12/27/2024" class="day">27</td>
+                                                    <td data-action="selectDay" data-day="12/28/2024" class="day weekend">28</td>
                                                 </tr>
                                                 <tr>
-                                                    <td data-action="selectDay" data-day="11/24/2024" class="day weekend">24</td>
-                                                    <td data-action="selectDay" data-day="11/25/2024" class="day">25</td>
-                                                    <td data-action="selectDay" data-day="11/26/2024" class="day active today">26</td>
-                                                    <td data-action="selectDay" data-day="11/27/2024" class="day">27</td>
-                                                    <td data-action="selectDay" data-day="11/28/2024" class="day">28</td>
-                                                    <td data-action="selectDay" data-day="11/29/2024" class="day">29</td>
-                                                    <td data-action="selectDay" data-day="11/30/2024" class="day weekend">30</td>
+                                                    <td data-action="selectDay" data-day="12/29/2024" class="day weekend">29</td>
+                                                    <td data-action="selectDay" data-day="12/30/2024" class="day">30</td>
+                                                    <td data-action="selectDay" data-day="12/31/2024" class="day">31</td>
+                                                    <td data-action="selectDay" data-day="01/01/2025" class="day new">1</td>
+                                                    <td data-action="selectDay" data-day="01/02/2025" class="day new">2</td>
+                                                    <td data-action="selectDay" data-day="01/03/2025" class="day new">3</td>
+                                                    <td data-action="selectDay" data-day="01/04/2025" class="day new weekend">4</td>
                                                 </tr>
                                                 <tr>
-                                                    <td data-action="selectDay" data-day="12/01/2024" class="day new weekend">1</td>
-                                                    <td data-action="selectDay" data-day="12/02/2024" class="day new">2</td>
-                                                    <td data-action="selectDay" data-day="12/03/2024" class="day new">3</td>
-                                                    <td data-action="selectDay" data-day="12/04/2024" class="day new">4</td>
-                                                    <td data-action="selectDay" data-day="12/05/2024" class="day new">5</td>
-                                                    <td data-action="selectDay" data-day="12/06/2024" class="day new">6</td>
-                                                    <td data-action="selectDay" data-day="12/07/2024" class="day new weekend">7</td>
+                                                    <td data-action="selectDay" data-day="01/05/2025" class="day new weekend">5</td>
+                                                    <td data-action="selectDay" data-day="01/06/2025" class="day new">6</td>
+                                                    <td data-action="selectDay" data-day="01/07/2025" class="day new">7</td>
+                                                    <td data-action="selectDay" data-day="01/08/2025" class="day new">8</td>
+                                                    <td data-action="selectDay" data-day="01/09/2025" class="day new">9</td>
+                                                    <td data-action="selectDay" data-day="01/10/2025" class="day new">10</td>
+                                                    <td data-action="selectDay" data-day="01/11/2025" class="day new weekend">11</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -213,7 +210,7 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td colspan="7"><span data-action="selectMonth" class="month">Jan</span><span data-action="selectMonth" class="month">Feb</span><span data-action="selectMonth" class="month">Mar</span><span data-action="selectMonth" class="month">Apr</span><span data-action="selectMonth" class="month">May</span><span data-action="selectMonth" class="month">Jun</span><span data-action="selectMonth" class="month">Jul</span><span data-action="selectMonth" class="month">Aug</span><span data-action="selectMonth" class="month">Sep</span><span data-action="selectMonth" class="month">Oct</span><span data-action="selectMonth" class="month active">Nov</span><span data-action="selectMonth" class="month">Dec</span></td>
+                                                    <td colspan="7"><span data-action="selectMonth" class="month">Jan</span><span data-action="selectMonth" class="month">Feb</span><span data-action="selectMonth" class="month">Mar</span><span data-action="selectMonth" class="month">Apr</span><span data-action="selectMonth" class="month">May</span><span data-action="selectMonth" class="month">Jun</span><span data-action="selectMonth" class="month">Jul</span><span data-action="selectMonth" class="month">Aug</span><span data-action="selectMonth" class="month">Sep</span><span data-action="selectMonth" class="month">Oct</span><span data-action="selectMonth" class="month">Nov</span><span data-action="selectMonth" class="month active">Dec</span></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -257,6 +254,7 @@
                     </div>
                 </div>
             </div>
+            <!-- /.card-body -->
         </div>
     </section>
 </div>
@@ -280,6 +278,9 @@
             success: function(response) {
                 if (response.year) {
                     $('#year').html(response.year);
+
+                    const currentYear = new Date().getFullYear();
+                    $('#year').val(currentYear);
                 }
             },
             error: function(xhr, thrownError) {
@@ -288,52 +289,25 @@
         });
     }
 
-    function showSalesChart(year) {
+    function showSalesChart() {
+        const year = $('#year').val() || new Date().getFullYear();
         $.ajax({
-            url: "<?= site_url('main/fetchMonthlySales') ?>/" + year,
+            type: "post",
+            url: "<?= site_url('main/fetchSalesData') ?>",
+            data: {
+                year: year
+            },
             dataType: "json",
+            beforeSend: function() {
+                $('#sales-chart').html('<i class="fa fa-spin fa-spinner"></i>');
+            },
             success: function(response) {
-                if (response.months && response.sales) {
-                    const ctx = document.getElementById('sales-chart').getContext('2d');
-
-                    // Clear existing chart instance (if any)
-                    if (window.salesChart) {
-                        window.salesChart.destroy();
-                    }
-
-                    // Create new chart
-                    window.salesChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: response.months, // Full list of months
-                            datasets: [{
-                                label: 'Sales',
-                                data: response.sales, // Data for each month
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                fill: true,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(tooltipItem) {
-                                            return 'Sales: ' + tooltipItem.raw;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                if (response.data) {
+                    $('#sales-chart').html(response.data);
                 }
             },
             error: function(xhr, thrownError) {
-                console.error('Error fetching sales data:', xhr.status, xhr.responseText, thrownError);
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
             }
         });
     }

@@ -20,11 +20,12 @@ class UserLevelFilter implements FilterInterface
 
                 return redirect()->to('/restricted');
             }
+
+            return redirect()->to('/restricted');
         }
+
+        return;
     }
 
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
-    {
-        
-    }
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) {}
 }

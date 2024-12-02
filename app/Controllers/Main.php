@@ -67,22 +67,23 @@ class Main extends BaseController
         }
     }
 
-    public function fetchSalesData($year)
+    public function fetchSalesData()
     {
         if ($this->request->isAJAX()) {
-            $fetchSaleData = $this->transactions->getMonthlySalesData($year);
+            $year = $this->request->getPost('year');
 
-            $months = [];
-            $salesCounts = [];
+            $query = $this->db->query("SELECT DATE_FORMAT(date_time, '%M') AS month, DATE_FORMAT(date_time, '%Y') AS year, COUNT(invoice) AS transactions
+            FROM transactions WHERE DATE_FORMAT(date_time, '%Y') = '$year' GROUP BY DATE_FORMAT(date_time, '%M') ORDER BY date_time ASC")
+            ->getResult();
 
-            foreach ($fetchSaleData as $data) {
-                $months[] = date("F", mktime(0, 0, 0, $data->month, 10));
-                $salesCounts[] = $data->total_sales;
-            }
+            $data =  [
+                'chart' => $query
+            ];
+
             $msg = [
-                'months' => $months,
-                'sales' => $salesCounts
-            ];  
+                'data' => view('templates/salesChart', $data)
+            ];
+
             echo json_encode($msg);
         }
     }

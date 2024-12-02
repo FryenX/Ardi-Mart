@@ -87,3 +87,5 @@ $routes->post('transactions/payment', 'Transactions::payment');
 $routes->post('transactions/saveData', 'Transactions::saveData');
 $routes->get('transactions/printInvoice', 'Transactions::printInvoice');
 $routes->post('transactions/printInvoice', 'Transactions::printInvoice');
+
+$routes->set404Override();

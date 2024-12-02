@@ -1,90 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
+<?= $this->extend('templates/menu'); ?>
 
-<head>
-    <meta charset="utf-8">
-    <title><?= lang('Errors.pageNotFound') ?></title>
+<?= $this->section('title'); ?>
+<h3>
+</h3>
+<?= $this->endSection(); ?>
 
-    <style>
-        div.logo {
-            height: 200px;
-            width: 155px;
-            display: inline-block;
-            opacity: 0.08;
-            position: absolute;
-            top: 2rem;
-            left: 50%;
-            margin-left: -73px;
-        }
+<?= $this->section('content') ?>
+<section class="content">
+    <div class="error-page">
+        <h2 class="headline text-danger">403</h2>
 
-        body {
-            height: 100%;
-            background: #fafafa;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            color: #777;
-            font-weight: 300;
-        }
+        <div class="error-content">
+            <h3><i class="fas fa-exclamation-triangle text-danger"></i> Oops! Directory Access is Forbidden.</h3>
 
-        h1 {
-            font-weight: lighter;
-            letter-spacing: normal;
-            font-size: 3rem;
-            margin-top: 0;
-            margin-bottom: 0;
-            color: #222;
-        }
+            <p>
+                You are not allowed to access this page.
+                You may <br /> <a href="<?= base_url('/') ?>">return to dashboard</a> or try using the search form.
+            </p>
 
-        .wrap {
-            max-width: 1024px;
-            margin: 5rem auto;
-            padding: 2rem;
-            background: #fff;
-            text-align: center;
-            border: 1px solid #efefef;
-            border-radius: 0.5rem;
-            position: relative;
-        }
-
-        pre {
-            white-space: normal;
-            margin-top: 1.5rem;
-        }
-
-        code {
-            background: #fafafa;
-            border: 1px solid #efefef;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            display: block;
-        }
-
-        p {
-            margin-top: 1.5rem;
-        }
-
-        .footer {
-            margin-top: 2rem;
-            border-top: 1px solid #efefef;
-            padding: 1em 2em 0 2em;
-            font-size: 85%;
-            color: #999;
-        }
-
-        a:active,
-        a:link,
-        a:visited {
-            color: #dd4814;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="wrap">
-        <h1>403 Forbidden</h1>
-        
-        <p>You do not have permission to access this page.</p>
-
+            <?= form_open('', ['id' => 'search', 'method' => 'get']) ?>
+            <?= csrf_field() ?>
+            <div class="input-group">
+                <input type="text" id="search-input" name="search" class="form-control" placeholder="Search">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <?= form_close(); ?>
+        </div>
     </div>
-</body>
+</section>
+<script>
+    $(document).ready(function() {
+        $('#search').submit(function(e) {
+            e.preventDefault();
 
-</html>
+            var searchValue = $('#search-input').val();
+
+            var url = "<?= base_url() ?>/" + searchValue
+
+            window.location.href = url;
+        });
+    });
+</script>
+<?= $this->endSection(); ?>
