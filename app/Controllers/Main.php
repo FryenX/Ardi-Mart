@@ -74,7 +74,7 @@ class Main extends BaseController
 
             $query = $this->db->query("SELECT DATE_FORMAT(date_time, '%M') AS month, DATE_FORMAT(date_time, '%Y') AS year, COUNT(invoice) AS transactions
             FROM transactions WHERE DATE_FORMAT(date_time, '%Y') = '$year' GROUP BY DATE_FORMAT(date_time, '%M') ORDER BY date_time ASC")
-            ->getResult();
+                ->getResult();
 
             $data =  [
                 'chart' => $query
@@ -82,6 +82,28 @@ class Main extends BaseController
 
             $msg = [
                 'data' => view('templates/salesChart', $data)
+            ];
+
+            echo json_encode($msg);
+        }
+    }
+
+    public function fetchProductsData()
+    {
+        if ($this->request->isAJAX()) {
+            $year = $this->request->getPost('year');
+
+            $query = $this->db->query("SELECT products.name, transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') AS year, 
+            COUNT(transactions_detail.barcode) AS qty FROM transactions_detail JOIN transactions ON transactions_detail.invoice = transactions.invoice 
+            JOIN products ON transactions_detail.barcode = products.barcode WHERE DATE_FORMAT(transactions.date_time, '%Y') = '$year' 
+            GROUP BY transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') ORDER BY transactions.date_time ASC;")->getResult();
+
+            $data =  [
+                'chart' => $query
+            ];
+
+            $msg = [
+                'data' => view('templates/productsChart', $data)
             ];
 
             echo json_encode($msg);

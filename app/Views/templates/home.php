@@ -65,20 +65,52 @@
 <div class="row">
     <div class="col-lg-7 connectedSortable ui-sortable">
         <div class="card">
-            <div class="card-header ui-sortable-handle bg-primary" style="cursor: move;">
-                <h1 class="card-title d-flex" style="font-size: 28px;">
+            <div class="card-header ui-sortable-handle" style="cursor: move; display: flex; justify-content: space-between; align-items: center;">
+                <!-- Left: Sales -->
+                <h1 class="card-title" style="font-size: 24px;">
                     <i class="fas fa-chart-pie mr-1"></i>
                     Sales
                 </h1>
+
+                <div class="text-center" style="flex-grow: 1;">
+                    <ul class="nav nav-pills justify-content-center">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#sales-chart" data-toggle="tab">Sales</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#products-chart" data-toggle="tab">Products</a>
+                        </li>
+                    </ul>
+                </div>
+
                 <div class="card-tools">
-                    <select class="custom-select" style="height: 30px; line-height: 15px;" id="year" name="year">
+                    <select class="custom-select" style="height: 100%; line-height: 20px;" id="year" name="year">
+                        <!-- Option values go here -->
                     </select>
                 </div>
             </div>
+
             <div class="card-body">
                 <div class="tab-content p-0">
                     <div class="chart tab-pane active" id="sales-chart" style="position: relative; ">
-
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart tab-pane active" id="products-chart" style="position: relative;">
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -116,7 +148,7 @@
                 <!-- /. tools -->
             </div>
             <!-- /.card-header -->
-            <div class="card-body pt-0">
+            <div class="card-body pt-0 text-center">
                 <!--The calendar -->
                 <div id="calendar" style="width: 100%">
                     <div class="bootstrap-datetimepicker-widget usetwentyfour">
@@ -264,10 +296,12 @@
         showSaleYears();
         const currentYear = new Date().getFullYear();
         showSalesChart(currentYear);
+        showProductsChart(currentYear);
 
         $('#year').change(function() {
             const selectedYear = $(this).val();
             showSalesChart(selectedYear);
+            showProductsChart(selectedYear);
         });
     });
 
@@ -304,6 +338,29 @@
             success: function(response) {
                 if (response.data) {
                     $('#sales-chart').html(response.data);
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
+    }
+
+    function showProductsChart() {
+        const year = $('#year').val() || new Date().getFullYear();
+        $.ajax({
+            type: "post",
+            url: "<?= site_url('main/fetchProductsData') ?>",
+            data: {
+                year: year
+            },
+            dataType: "json",
+            beforeSend: function() {
+                $('#products-chart').html('<i class="fa fa-spin fa-spinner"></i>');
+            },
+            success: function(response) {
+                if (response.data) {
+                    $('#products-chart').html(response.data);
                 }
             },
             error: function(xhr, thrownError) {

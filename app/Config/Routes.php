@@ -8,7 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Main::index');
 $routes->post('main/fetchSalesData', 'Main::fetchSalesData');
 $routes->get('main/fetchSaleYears', 'Main::fetchSaleYears');
-$routes->get('main/fetchMonthlySales/(:any)', 'Main::fetchSalesData/$1');
+$routes->post('main/fetchProductsData', 'Main::fetchProductsData');
 $routes->get('/restricted', 'restricted::index');
 
 // Login 
