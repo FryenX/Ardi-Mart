@@ -89,13 +89,12 @@
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <ul class="nav">
-                            <?php
-                            $userLevel = session()->get('level_info');
-                            ?>
-                            <?php
-                            if ($userLevel == 'Admin' || $userLevel == 'Manager') {
-                                echo "<li class='nav-item'>
+                        <?php
+                        $userLevel = session()->get('level_info');
+                        ?>
+                        <?php
+                        if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                            echo "<li class='nav-item'>
                                 <a href='" . site_url('/') . "' class='nav-link'>
                                     <i class='nav-icon fa fa-tachometer-alt'></i>
                                         <p>
@@ -103,17 +102,17 @@
                                         </p>
                                     </a>
                                 </li>";
-                            }
-                            ?>
-                            <?php
-                            if ($userLevel == 'Admin' || $userLevel == 'Manager') {
-                                echo "<li class='nav-header'>Master</li>";
-                            }
-                            ?>
+                        }
+                        ?>
+                        <?php
+                        if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                            echo "<li class='nav-header'>Master</li>";
+                        }
+                        ?>
 
-                            <?php
-                            if ($userLevel == 'Admin' || $userLevel == 'Manager') {
-                                echo "<li class='nav-item'>
+                        <?php
+                        if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                            echo "<li class='nav-item'>
                                 <a href='" . site_url('users') . "' class='nav-link'>
                                     <i class='nav-icon fa fa-users'></i>
                                     <p>
@@ -121,11 +120,11 @@
                                     </p>
                                 </a>
                             </li>";
-                            }
-                            ?>
-                            <?php
-                            if ($userLevel == 'Admin' || $userLevel == 'Manager') {
-                                echo "<li class='nav-item'>
+                        }
+                        ?>
+                        <?php
+                        if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                            echo "<li class='nav-item'>
                                 <a href='" . site_url('categories') . "' class='nav-link'>
                                     <i class='nav-icon fa fa-list'></i>
                                     <p>
@@ -133,11 +132,11 @@
                                     </p>
                                 </a>
                             </li>";
-                            }
-                            ?>
-                            <?php
-                            if ($userLevel == 'Admin' || $userLevel == 'Manager') {
-                                echo "<li class='nav-item'>
+                        }
+                        ?>
+                        <?php
+                        if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                            echo "<li class='nav-item'>
                                 <a href='" . site_url('units') . "' class='nav-link'>
                                     <i class='nav-icon fa fa-list'></i>
                                     <p>
@@ -145,11 +144,11 @@
                                     </p>
                                 </a>
                             </li>";
-                            }
-                            ?>
-                            <?php
-                            if ($userLevel == 'Admin' || $userLevel == 'Manager') {
-                                echo "<li class='nav-item'>
+                        }
+                        ?>
+                        <?php
+                        if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                            echo "<li class='nav-item'>
                                 <a href='" . site_url('products') . "' class='nav-link'>
                                     <i class='nav-icon fa fa-table'></i>
                                     <p>
@@ -157,11 +156,11 @@
                                     </p>
                                 </a>
                             </li>";
-                            }
-                            ?>
-                            <?php
-                            if ($userLevel == 'Admin') {
-                                echo "<li class='nav-item'>
+                        }
+                        ?>
+                        <?php
+                        if ($userLevel == 'Admin') {
+                            echo "<li class='nav-item'>
                                 <a href='" . site_url('levels') . "' class='nav-link'>
                                 <i class='nav-icon fa fa-share'></i> 
                                     <p>
@@ -169,19 +168,17 @@
                                     </p>
                                 </a>
                             </li>";
-                            }
-                            ?>
-                            <li class="nav-header">Transaction</li>
-                            <li class="nav-item">
-                                <a href="<?= site_url('transactions') ?>" class="nav-link">
-                                    <i class="nav-icon fa fa-table"></i>
-                                    <p>
-                                        Sale
-                                    </p>
-                                </a>
-                            </li>
-                        </ul>
-
+                        }
+                        ?>
+                        <li class="nav-header">Transaction</li>
+                        <li class="nav-item">
+                            <a href="<?= site_url('transactions') ?>" class="nav-link">
+                                <i class="nav-icon fa fa-table"></i>
+                                <p>
+                                    Sale
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -224,12 +221,12 @@
                             </p>
 
                             <form action="" id="search" method="get">
-                            <div class="input-group">
-                                <input type="text" id="search-input" name="search" class="form-control" placeholder="Search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-danger"><i class="fas fa-search"></i></button>
+                                <div class="input-group">
+                                    <input type="text" id="search-input" name="search" class="form-control" placeholder="Search">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-danger"><i class="fas fa-search"></i></button>
+                                    </div>
                                 </div>
-                            </div>
                             </form>
                         </div>
                     </div>

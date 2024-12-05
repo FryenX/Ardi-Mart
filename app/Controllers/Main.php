@@ -17,17 +17,17 @@ class Main extends BaseController
     public function index()
     {
         $current_date = date('Y-m-d');
-        $one_month = date('Y-m-d', strtotime('-30 Days'));
+        $one_day = $current_date;
 
         $new_transactions = $this->db->table('transactions')
             ->selectCount('invoice')
-            ->where('DATE(date_time) >=', $one_month)
+            ->where('DATE(date_time) >=', $one_day)
             ->where('DATE(date_time) <=', $current_date)
             ->get()->getRow();
         $profit = $this->db->table('transactions_detail')
             ->select('SUM(transactions.net_total - (transactions_detail.purchase_price * transactions_detail.qty)) AS profit')
             ->join('transactions', 'transactions_detail.invoice = transactions.invoice')
-            ->where('DATE(transactions.date_time) >=', $one_month)
+            ->where('DATE(transactions.date_time) >=', $one_day)
             ->where('DATE(transactions.date_time) <=', $current_date)
             ->get()
             ->getRow();
@@ -93,7 +93,7 @@ class Main extends BaseController
         if ($this->request->isAJAX()) {
             $year = $this->request->getPost('year');
 
-            $query = $this->db->query("SELECT products.name, transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') AS year, 
+            $query = $this->db->query("SELECT products.name AS name, transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') AS year, 
             COUNT(transactions_detail.barcode) AS qty FROM transactions_detail JOIN transactions ON transactions_detail.invoice = transactions.invoice 
             JOIN products ON transactions_detail.barcode = products.barcode WHERE DATE_FORMAT(transactions.date_time, '%Y') = '$year' 
             GROUP BY transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') ORDER BY transactions.date_time ASC;")->getResult();

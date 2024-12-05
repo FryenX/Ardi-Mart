@@ -335,73 +335,70 @@ class Users extends BaseController
         }
     }
 
-    public function checkOldPassword($password)
-    {
-        $uuid = session()->get('uuid');
-        $user = $this->users->find($uuid);
-
-        if (password_verify($password, $user['password'])) {
-            return true;
-        }
-
-        return false;
-    }
-
     public function updatePassword()
     {
-        if ($this->request->isAJAX()) {
-            $uuid       = $this->request->getVar('uuid');
-            $email      = filter_var($this->request->getVar('email'), FILTER_SANITIZE_EMAIL);
-            $validation = \Config\Services::validation();
+        $oldPassword = $this->request->getPost('oldPassword');
+        $newPassword = $this->request->getPost('newPassword');
+        $uuid = $this->request->getPost('uuid');
+        $user = $this->users->where('uuid', $uuid)->get()->getRowArray();
 
-            $doValid = $this->validate([
-                'email' => [
-                    'label'  => 'Email',
-                    'rules'  => 'required|valid_email',
-                    'errors' => [
-                        'required'    => '{field} can\'t be empty',
-                        'valid_email' => '{field} must be a valid email address',
-                    ]
+        $validation = \Config\Services::validation();
+
+        $doValid = $this->validate([
+            'oldPassword' => [
+                'label'  => 'Old Password',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} Can\'t be Empty'
                 ]
-            ]);
+            ],
+            'newPassword' => [
+                'label'  => 'New Password',
+                'rules' => 'required|min_length[8]|max_length[20]|regex_match[/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/]',
+                'errors' => [
+                    'required' => 'The {field} field is required.',
+                    'min_length' => 'Password must be at least 8 characters long.',
+                    'max_length' => 'Password cannot exceed 20 characters.',
+                    'regex_match' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                ],
+            ],
+            'confirmPassword' => [
+                'label'  => 'Confirm Password',
+                'rules'  => 'required|matches[newPassword]',
+                'errors' => [
+                    'matches' => 'Password doesn\'t match',
+                    'required' => '{field} Can\'t be Empty'
+                ]
+            ]
+        ]);
 
-            if (!$doValid) {
+        if (!$doValid) {
+            $msg = [
+                'error' => [
+                    'errorOldPassword' => $validation->getError('oldPassword'),
+                    'errorNewPassword' => $validation->getError('newPassword'),
+                    'errorConfirmPassword' => $validation->getError('confirmPassword')
+                ]
+            ];
+        } else {
+            if (!password_verify($oldPassword, $user['password'])) {
                 $msg = [
-                    'error' => [
-                        'errorEmail' => $validation->getError('email'),
-                    ]
+                    'failed' => 'The Old Password is incorrect'
                 ];
             } else {
-                $user = $this->users->where('uuid', $uuid)->first();
-                $verifyEmail = $this->users->verifyEMail($email);
-                if (!empty($verifyEmail)) {
-                    $to = $email;
-                    $subject = 'Reset Password';
-                    $token = $uuid;
-                    $message = 'Hi ' . $user['name'] . '</br></br>'
-                            . 'Your Reset Password Has been Received. Please click the link below'
-                            . 'to reset your password. </br></br>'
-                            . '<a href="'. site_url() .'/user/reset_password/'. $token .'">Click Here</a>'
-                            . 'Thanks</br>Ardi Mart';
-                    
-                    $email = \Config\Services::email();
-                    $email->setTo($to);
-                    $email->setFrom('ardiwidana@gmail.com', 'ArdiMart');
-                    $email->setSubject($subject);
-                    $email->setMessage($message);
-                    
-                    if($email->send()) {
-                        $msg = ['success' => 'Reset Password Token Has Been Sent, Please Verify Within 10 Minutes'];
-                    } else {
-                        $msg = ['failed' => 'Failed to Send Email'];
-                    }
-
-                } else {
-                    $msg = ['failed' => 'Email Does\'t exist'];
+                if ($user) {
+                    $this->users->update($uuid, [
+                        'password' => password_hash($newPassword, PASSWORD_DEFAULT),
+                        'updated_at' => Time::now(),
+                    ]);
                 }
-            }
 
-            return $this->response->setJSON($msg);
+                $msg = [
+                    'success' => 'Password Is Successfully Changed'
+                ];
+            }
         }
+
+        echo json_encode($msg);
     }
 }

@@ -429,4 +429,14 @@ class Transactions extends BaseController
         echo "Invoice Printed Successfully";
         $printer->close();
     }
+
+    public function data()
+    {
+        return view('transactions/data');
+    }
+
+    public function showTransactionsData()
+    {
+        
+    }
 }

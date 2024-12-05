@@ -56,19 +56,23 @@ endforeach;
                 }
             },
             scales: {
-                x: {
+                xAxes: [{
                     title: {
                         display: true,
                         text: 'Months'
                     }
-                },
-                y: {
+                }],
+                yAxes: [{
                     title: {
                         display: true,
                         text: 'Transactions'
                     },
-                    beginAtZero: true
-                }
+                    ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 200
+                    }
+                }]
             },
             onClick: function(evt, elements) {
                 if (elements.length > 0) {

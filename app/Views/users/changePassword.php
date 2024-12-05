@@ -29,10 +29,30 @@
         <?= csrf_field() ?>
         <input type="hidden" name="uuid" id="uuid" value="<?= $uuid ?>">
         <div class="form-group row" style="height: 50px;">
-            <label for="email" class="col-sm-4 col-form-label is-invalid">Email</label>
+            <label for="oldPassword" class="col-sm-4 col-form-label is-invalid">Old Password</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" placeholder="Input Your Previous Password" id="email" name="email" autofocus>
-                <div id="errorEmail" class="invalid-feedback" style="display: none;">
+                <input type="text" class="form-control" placeholder="Input Your Previous Password" id="oldPassword" name="oldPassword" autofocus>
+                <div id="errorOldPassword" class="invalid-feedback" style="display: none;">
+                </div>
+                <div class="valid-feedback" style="display: none;">
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" style="height: 50px;">
+            <label for="newPassword" class="col-sm-4 col-form-label is-invalid">New Password</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" placeholder="Input New Password" id="newPassword" name="newPassword" autofocus>
+                <div id="errorNewPassword" class="invalid-feedback" style="display: none;">
+                </div>
+                <div class="valid-feedback" style="display: none;">
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" style="height: 50px;">
+            <label for="confirmPassword" class="col-sm-4 col-form-label is-invalid">Confirm Password</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" autofocus>
+                <div id="errorConfirmPassword" class="invalid-feedback" style="display: none;">
                 </div>
                 <div class="valid-feedback" style="display: none;">
                 </div>
@@ -80,12 +100,26 @@
             success: function(response) {
                 if (response.error) {
                     let dataError = response.error;
-                    if (dataError.errorEmail) {
-                        $('#errorEmail').html(dataError.errorEmail).show();
-                        $('#email').addClass('is-invalid');
+                    if (dataError.errorOldPassword) {
+                        $('#errorOldPassword').html(dataError.errorOldPassword).show();
+                        $('#oldPassword').addClass('is-invalid');
                     } else {
-                        $('#errorEmail').fadeOut();
-                        $('#email').removeClass('is-invalid').addClass('is-valid');
+                        $('#errorOldPassword').fadeOut();
+                        $('#oldPassword').removeClass('is-invalid').addClass('is-valid');
+                    }
+                    if (dataError.errorNewPassword) {
+                        $('#errorNewPassword').html(dataError.errorNewPassword).show();
+                        $('#newPassword').addClass('is-invalid');
+                    } else {
+                        $('#errorNewPassword').fadeOut();
+                        $('#newPassword').removeClass('is-invalid').addClass('is-valid');
+                    }
+                    if (dataError.errorConfirmPassword) {
+                        $('#errorConfirmPassword').html(dataError.errorConfirmPassword).show();
+                        $('#confirmPassword').addClass('is-invalid');
+                    } else {
+                        $('#errorConfirmPassword').fadeOut();
+                        $('#confirmPassword').removeClass('is-invalid').addClass('is-valid');
                     }
                 } else {
                     if (response.success) {
@@ -105,7 +139,7 @@
                             html: response.failed,
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.reload
+                                $('#oldPassword').select();
                             }
                         });
                     }
