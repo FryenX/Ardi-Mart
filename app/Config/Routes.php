@@ -15,6 +15,10 @@ $routes->get('/restricted', 'restricted::index');
 $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');
 $routes->post('login/logout', 'Login::logout');
+$routes->get('login/rememberMe', 'Login::rememberMe');
+$routes->post('login/rememberMe', 'Login::rememberMe');
+$routes->get('login/forget', 'Login::forgetPassword');
+$routes->get('login/isLoggedIn', 'Login::isLoggedIn');
 
 // Users
 $routes->get('/users', 'users::index');
@@ -29,6 +33,7 @@ $routes->post('users/updatePassword', 'users::updatePassword');
 $routes->post('/users/delete', 'users::delete');
 $routes->get('/users/index', 'users::index');
 $routes->get('users/fetchDataLevels', 'Users::fetchDataLevels');
+$routes->get('profile/(:segment)', 'Users::profile/$1', ['filter' => 'UuidFilter']);
 
 // Categories
 $routes->get('categories', 'Categories::index');

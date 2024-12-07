@@ -25,14 +25,21 @@
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                     <div class="card shadow-2-strong" style="border-radius: 1rem;">
+
                         <div class="card-body p-5">
-                            <h3 class="mb-5 text-center" style="font-weight: 900; font-size: 3.2rem;">Login</h3>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <button type="button" class="btn btn-warning" onclick="window.location='<?= site_url('login') ?>'">
+                                    <i class="fa fa-backward"></i> Back
+                                </button>
+                                <h3 class="mb-0 text-center" style="font-weight: 900; font-size: 2rem;">Forget Password?</h3>
+                            </div>
+
                             <?= form_open('', ['id' => 'formAuth']) ?>
                             <?= csrf_field() ?>
                             <div style="height: 70px;">
                                 <div class="form-outline mb-4 d-flex">
                                     <div class="input-group">
-                                        <input type="text" name="username" id="username" class="form-control" placeholder="Username">
+                                        <input type="text" name="email" id="email" class="form-control" placeholder="Enter Your Email">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <i class="fa fa-user"></i>
@@ -45,33 +52,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div style="height: 70px;">
-                                <div class="form-outline mb-4 d-flex">
-                                    <div class="input-group">
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-default" id="togglePassword" style="border-radius: 0 5px 5px 0;">
-                                                <i class="bi bi-eye-slash"></i>
-                                            </button>
-                                        </div>
-                                        <div id="errorPassword" class="invalid-feedback" style="display: none;">
-                                        </div>
-                                        <div class="valid-feedback" style="display: none;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Checkbox -->
-                            <div class="justify-content-between d-flex">
-                                <div class="form-check d-flex justify-content-start mb-4">
-                                    <input class="form-check-input" type="checkbox" <?php if(!empty($username) && !empty($password)) {echo "checked";} ?> value="1" id="rememberMe" name="rememberMe" />
-                                    <label class="form-check-label" for="rememberMe"> Remember Me</label>
-                                </div>
-                                <div>
-                                    <a href="<?= base_url('login/forget') ?>">Forget Password?</a>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-lg btn-block" id="login" type="submit">Login</button>
+                            <button class="btn btn-primary btn-lg btn-block" id="reset" type="submit">Reset</button>
                             <?= form_close() ?>
                         </div>
                     </div>

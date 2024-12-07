@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\ManagerFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -36,6 +37,8 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\AuthFilter::class,
         'userLevel'     => \App\Filters\UserLevelFilter::class,
+        'managerFilter' => \App\Filters\ManagerFilter::class,
+        'UuidFilter'    => \App\Filters\UuidFilter::class
     ];
 
     /**
@@ -74,7 +77,7 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
-            'auth' => ['except' => ['login', 'login/auth']],
+            'auth' => ['except' => ['login', 'login/auth', 'login/rememberMe', 'login/forget']],
         ],
         'after' => [
             // 'honeypot',
@@ -124,5 +127,11 @@ class Filters extends BaseFilters
                 'products/*',
             ]
         ],
+        'managerFilter' => [
+            'before' => [
+                'levels',
+                'levels/*',
+            ]
+        ]
     ];
 }

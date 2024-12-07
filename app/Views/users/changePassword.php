@@ -31,7 +31,12 @@
         <div class="form-group row" style="height: 50px;">
             <label for="oldPassword" class="col-sm-4 col-form-label is-invalid">Old Password</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" placeholder="Input Your Previous Password" id="oldPassword" name="oldPassword" autofocus>
+                <div class="d-flex">
+                    <input type="password" class="form-control" placeholder="Input Your Previous Password" id="oldPassword" name="oldPassword" autofocus>
+                    <button type="button" class="btn btn-default" id="toggleOldPassword" style="border-radius: 0 5px 5px 0;">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                </div>
                 <div id="errorOldPassword" class="invalid-feedback" style="display: none;">
                 </div>
                 <div class="valid-feedback" style="display: none;">
@@ -41,7 +46,12 @@
         <div class="form-group row" style="height: 50px;">
             <label for="newPassword" class="col-sm-4 col-form-label is-invalid">New Password</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" placeholder="Input New Password" id="newPassword" name="newPassword" autofocus>
+                <div class="d-flex">
+                    <input type="password" class="form-control" placeholder="Input New Password" id="newPassword" name="newPassword">
+                    <button type="button" class="btn btn-default" id="toggleNewPassword" style="border-radius: 0 5px 5px 0;">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                </div>
                 <div id="errorNewPassword" class="invalid-feedback" style="display: none;">
                 </div>
                 <div class="valid-feedback" style="display: none;">
@@ -51,7 +61,12 @@
         <div class="form-group row" style="height: 50px;">
             <label for="confirmPassword" class="col-sm-4 col-form-label is-invalid">Confirm Password</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword" autofocus>
+                <div class="d-flex">
+                    <input type="password" class="form-control" placeholder="Confirm Password" id="confirmPassword" name="confirmPassword">
+                    <button type="button" class="btn btn-default" id="toggleConfirmPassword" style="border-radius: 0 5px 5px 0;">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                </div>
                 <div id="errorConfirmPassword" class="invalid-feedback" style="display: none;">
                 </div>
                 <div class="valid-feedback" style="display: none;">
@@ -150,5 +165,44 @@
             }
         });
     })
+
+    document.getElementById('toggleOldPassword').addEventListener('click', function() {
+        var passwordField = document.getElementById('oldPassword');
+        var passwordFieldType = passwordField.type;
+
+        if (passwordFieldType === 'password') {
+            passwordField.type = 'text';
+            this.innerHTML = '<i class="bi bi-eye"></i>';
+        } else {
+            passwordField.type = 'password';
+            this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+        }
+    });
+
+    document.getElementById('toggleNewPassword').addEventListener('click', function() {
+        var passwordField = document.getElementById('newPassword');
+        var passwordFieldType = passwordField.type;
+
+        if (passwordFieldType === 'password') {
+            passwordField.type = 'text';
+            this.innerHTML = '<i class="bi bi-eye"></i>';
+        } else {
+            passwordField.type = 'password';
+            this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+        }
+    });
+
+    document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+        var passwordField = document.getElementById('confirmPassword');
+        var passwordFieldType = passwordField.type;
+
+        if (passwordFieldType === 'password') {
+            passwordField.type = 'text';
+            this.innerHTML = '<i class="bi bi-eye"></i>';
+        } else {
+            passwordField.type = 'password';
+            this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+        }
+    });
 </script>
 <?= $this->endSection(); ?>

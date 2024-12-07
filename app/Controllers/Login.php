@@ -16,21 +16,32 @@ class Login extends BaseController
         $username = $this->request->getCookie('username');
         $password = $this->request->getCookie('password');
 
-        if ($username && $password) {
-            $auth = $this->users->login($username, $password);
-            if ($auth) {
-                session()->set([
-                    'isLoggedIn' => true,
-                    'uuid'        => $auth['uuid'],
-                    'name'        => $auth['name'],
-                    'username'    => $auth['username'],
-                    'image'       => $auth['image'],
-                ]);
-                return redirect()->to(base_url());
-            }
+        if (!empty($username) && !empty($password)) {
+            return redirect()->to('login/rememberMe');
         }
-
         return view('login/index');
+    }
+
+    public function rememberMe()
+    {
+        $username = $this->request->getCookie('username');
+        $password = $this->request->getCookie('password');
+
+        $auth = $this->users->login($username, $password);
+        if ($auth) {
+            session()->set([
+                'isLoggedIn'  => true,
+                'justLoggedIn'=> true,
+                'uuid'        => $auth['uuid'],
+                'name'        => $auth['name'],
+                'level_info'  => $auth['info'],
+                'username'    => $auth['username'],
+                'image'       => $auth['image'],
+            ]);
+        }
+        $msg = ['success' => 'Login Successful'];
+        echo json_encode($msg);
+        return redirect()->to('/');
     }
 
     public function auth()
@@ -38,7 +49,7 @@ class Login extends BaseController
         if ($this->request->isAJAX()) {
             $username = $this->request->getVar('username');
             $password = $this->request->getVar('password');
-            $rememberMe = $this->request->getVar('rememberMe');
+            $rememberMe = $this->request->getPost('rememberMe');
 
             $validation = \Config\Services::validation();
 
@@ -70,7 +81,8 @@ class Login extends BaseController
                 $auth = $this->users->login($username, $password);
                 if ($auth) {
                     session()->set([
-                        'isLoggedIn' => true,
+                        'isLoggedIn'  => true,
+                        'justLoggedIn'=> true,
                         'uuid'        => $auth['uuid'],
                         'name'        => $auth['name'],
                         'level_info'  => $auth['info'],
@@ -79,9 +91,11 @@ class Login extends BaseController
                     ]);
 
                     if ($rememberMe == '1') {
-                        $this->response->setCookie('username', $username, time() + 60 * 60 * 24 * 30, '/', '');
-                        $this->response->setCookie('password', $password, time() + 60 * 60 * 24 * 30, '/', '');                        
+                        $expiration = 60 * 60 * 24 * 30;
+                        $this->response->setCookie('username', $username, $expiration, '', '');
+                        $this->response->setCookie('password', $password, $expiration, '', '');
                     }
+
 
                     $msg = ['success' => 'Login Successful'];
                 } else {
@@ -93,12 +107,29 @@ class Login extends BaseController
         }
     }
 
+    public function isLoggedIn()
+    {
+        $justLoggedIn = session()->get('justLoggedIn');
+        $msg = '';
+        if($justLoggedIn == True)
+        {
+            session()->remove('justLoggedIn');
+            $msg = [
+                'login' => 'Welcome to Ardi Mart'
+            ];
+        }
+        echo json_encode($msg);
+    }
+
+    public function forgetPassword()
+    {
+        return view('login/forgetPassword');
+    }
+
     public function logout()
     {
-        $this->response->deleteCookie('username', '/');
-        $this->response->deleteCookie('password', '/');
         session()->destroy();
-
-        return redirect()->to('/login');
+        // return redirect()->to('/login');
+        return redirect()->deleteCookie('username')->deleteCookie('password')->to('/login');
     }
 }

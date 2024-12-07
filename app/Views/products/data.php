@@ -5,6 +5,9 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('content') ?>
+<?php
+
+use Picqer\Barcode\BarcodeGeneratorSVG; ?>
 <link rel="stylesheet" href="<?= base_url('assets') ?>/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="<?= base_url('assets') ?>/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 <script src="<?= base_url('assets') ?>/plugins/datatables/jquery.dataTables.min.js"></script>
@@ -49,6 +52,7 @@
                         <th>Product Name</th>
                         <th>Categories</th>
                         <th>Units</th>
+                        <th>Image</th>
                         <th>Purchase Price (IDR)</th>
                         <th>Sell Price (IDR)</th>
                         <th>Stock</th>
@@ -57,15 +61,31 @@
                 </thead>
                 <tbody>
                     <?php
+                    require '../vendor/autoload.php';
                     $num = 1 + (($pagenumber - 1) * 10);
                     foreach ($query as $row):
                     ?>
                         <tr>
                             <td><?= $num++ ?></td>
-                            <td><?= $row['barcode'] ?></td>
+                            <td>
+                                <?php
+                                $generator = new BarcodeGeneratorSVG();
+                                $fileName = "barcode" . $num . ".svg";
+                                file_put_contents($fileName, $generator->getBarcode($row['barcode'], $generator::TYPE_EAN_13, 2, 50));
+                                ?>
+
+                                <!-- Barcode Image -->
+                                <img src="<?= $fileName ?>" alt="Barcode" style="display: block; margin: 0 auto;">
+
+                                <!-- Barcode Text -->
+                                <span style="display: block; text-align: center; margin-top: 5px;">
+                                    <?= $row['barcode'] ?>
+                                </span>
+                            </td>
                             <td><?= $row['name'] ?></td>
                             <td><?= $row['category_name'] ?></td>
                             <td><?= $row['unit_name'] ?></td>
+                            <td class="text-center justify-content-center"><img src="<?= $row['image'] ?>" class="img-fluid text-center" style="width: 200px;" alt=""></td>
                             <td style="text-align: right;"><?= number_format($row['sell_price'], 2, ",", ".") ?></td>
                             <td style="text-align: right;"><?= number_format($row['purchase_price'], 2, ",", ".")  ?></td>
                             <td style="text-align: right;"><?= number_format($row['stocks'], 2, ",", ".") ?></td>

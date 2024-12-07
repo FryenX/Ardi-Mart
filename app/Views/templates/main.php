@@ -60,7 +60,7 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user (optional) -->
-                <div class="user-panel mt-3 mb-3 pb-3 d-flex align-items-center" style="display: flex; align-items: center;">
+                <div id="userPanelToggle" class="user-panel mt-3 mb-3 pb-3 d-flex align-items-center" style="display: flex; align-items: center;">
                     <div class="image" style="margin-right: 15px;">
                         <?php
                         $userImage = session()->get('image');
@@ -74,16 +74,17 @@
                         }
                         ?>
 
-                        <img src="<?= esc($imageSrc) ?>" class="img-circle elevation-2" style="object-fit: cover; width: 35px; height: 35px" alt="User Image">
+                        <a href="<?= site_url('/profile') ?>/<?= session()->get('uuid') ?>">
+                            <img src="<?= esc($imageSrc) ?>" class="img-circle elevation-2" style="object-fit: cover; width: 35px; height: 35px" alt="User Image">
+                        </a>
                     </div>
                     <div class="info">
                         <?php
                         $userName = session()->get('name');
                         ?>
-                        <a href="#" class="d-block" style="font-size: 26px; font-weight: 900; line-height: 22px;"><?= $userName ?></a>
+                        <a href="<?= site_url('/profile') ?>/<?= session()->get('uuid') ?>" class="d-block" style="font-size: 26px; font-weight: 900; line-height: 22px;"><?= $userName ?></a>
                     </div>
                 </div>
-
                 <!-- SidebarSearch Form -->
 
                 <!-- Sidebar Menu -->
@@ -135,16 +136,11 @@
             <strong>Copyright &copy; 2024 <a href="https://github.com/FryenX">Ardi Widana</a>.</strong> All rights reserved.
         </footer>
 
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
         <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
 
     <!-- jQuery -->
-
     <!-- Bootstrap 4 -->
     <script src="<?= base_url('assets') ?>/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
@@ -152,6 +148,34 @@
     <!-- AdminLTE for demo purposes -->
     <script src="<?= base_url('assets') ?>/dist/js/demo.js"></script>
     <!-- Code injected by live-server -->
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                type: "get",
+                url: "<?= site_url('login/isLoggedIn') ?>",
+                dataType: "json",
+                success: function(response) {
+                    if (response.login) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: response.login,
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            background: '#d4edda',
+                            color: '#155724',
+                            iconColor: '#198754',
+                        });
+                    }
+                },
+                error: function(xhr, thrownError) {
+                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -31,7 +31,7 @@ class Users extends BaseController
             $search = session()->get('searchUser');
         }
 
-        $data_user  = $search ? $this->users->searchData($search) : $this->users->select('users.id AS user_id, levels.id AS level_id, users.*, levels.*')->join('levels', 'levels.id=users.level_id');
+        $data_user  = $search ? $this->users->searchData($search) : $this->users->select('users.id AS user_id, levels.id AS level_id, users.*, levels.*')->join('levels', 'levels.id=users.level_id')->orderBy('users.level_id', 'ASC');
 
         $pagenumber = $this->request->getVar('page_users') ? $this->request->getVar('page_users') : 1;
         $data = [
@@ -400,5 +400,26 @@ class Users extends BaseController
         }
 
         echo json_encode($msg);
+    }
+
+    public function profile($uuid)
+    {
+        $row = $this->users->where('uuid', $uuid)->first();
+
+        if ($row) {
+            $data = [
+                'id'       => $row['id'],
+                'uuid'     => $row['uuid'],
+                'name'     => $row['name'],
+                'level_id' => $row['level_id'],
+                'data_level' => $this->levels->findAll(),
+                'username' => $row['username'],
+                'email'    => $row['email'],
+                'image'    => $row['image'],
+            ];
+            return view('users/profile', $data);
+        } else {
+            exit('No Data Found 404');
+        }
     }
 }

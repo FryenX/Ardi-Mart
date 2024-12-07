@@ -24,7 +24,7 @@ class usersModel extends Model
 
     public function searchData($search)
     {
-        return $this->table('users')->join('levels', 'levels.id=users.level_id')->like('users.name', $search)->orLike('info', $search);
+        return $this->table('users')->join('levels', 'levels.id=users.level_id')->like('users.name', $search)->orLike('info', $search)->orderBy('users.level_id', 'ASC');
     }
 
     public function login($username, $password)

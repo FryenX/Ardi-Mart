@@ -21,8 +21,7 @@ class Main extends BaseController
 
         $new_transactions = $this->db->table('transactions')
             ->selectCount('invoice')
-            ->where('DATE(date_time) >=', $one_day)
-            ->where('DATE(date_time) <=', $current_date)
+            ->where('DATE(date_time) =', $one_day)
             ->get()->getRow();
         $profit = $this->db->table('transactions_detail')
             ->select('SUM(transactions.net_total - (transactions_detail.purchase_price * transactions_detail.qty)) AS profit')
@@ -40,7 +39,7 @@ class Main extends BaseController
             'new_transactions' => $new_transactions->invoice,
             'profit' => $profit->profit,
             'data_user' => $data_user->id,
-            'product_data' => $product_data->barcode,
+            'product_data' => $product_data->barcode
         ];
         return view('templates/home', $data);
     }

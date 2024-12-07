@@ -12,7 +12,6 @@
         <div class="small-box bg-info">
             <div class="inner">
                 <h3><?= $new_transactions ?></h3>
-
                 <p>New Orders</p>
             </div>
             <div class="icon">
@@ -154,12 +153,15 @@
         font-size: 0.675 !important;
         padding: 0.30rem 0.50rem !important;
     }
+
     .fc-col-header-cell {
         background-color: #28a745;
     }
+
     .fc {
         color: white;
     }
+
     .fc-daygrid-day-number {
         color: white !important;
     }
@@ -167,12 +169,15 @@
     .fc-toolbar-title {
         color: white !important;
     }
+
     .fc-col-header-cell-cushion {
         color: white;
     }
+
     .fc-col-header-cell-cushion:hover {
         color: white;
     }
+
     .fc-day-today {
         background-color: rgb(61, 138, 52) !important;
     }
