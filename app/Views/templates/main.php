@@ -165,7 +165,6 @@
                             timer: 3000,
                             timerProgressBar: true,
                             background: '#d4edda',
-                            color: '#155724',
                             iconColor: '#198754',
                         });
                     }

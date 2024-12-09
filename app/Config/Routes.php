@@ -16,8 +16,13 @@ $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');
 $routes->post('login/logout', 'Login::logout');
 $routes->get('login/rememberMe', 'Login::rememberMe');
-$routes->post('login/rememberMe', 'Login::rememberMe');
+$routes->get('login/username', 'Login::username');
 $routes->get('login/forget', 'Login::forgetPassword');
+$routes->get('login/change/(:any)', 'Login::changePassword/$1');
+$routes->post('login/verifyUsername', 'Login::verifyUsername');
+$routes->post('login/changePassword', 'Login::changePassword');
+$routes->post('login/updatePassword', 'Login::updatePassword');
+$routes->post('login/rememberMe', 'Login::rememberMe');
 $routes->get('login/isLoggedIn', 'Login::isLoggedIn');
 
 // Users

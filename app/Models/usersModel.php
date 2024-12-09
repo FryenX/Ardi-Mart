@@ -30,11 +30,11 @@ class usersModel extends Model
     public function login($username, $password)
     {
         $user = $this->db->table('users')->join('levels', 'levels.id=users.level_id')->where('username', $username)->get()->getRowArray();
-
+        
         if ($user) {
             if (password_verify($password, $user['password'])) {
                 return $user;
-            }
+            } 
         }
 
         return false;

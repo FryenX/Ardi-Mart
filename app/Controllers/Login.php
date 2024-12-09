@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UsersModel;
+use CodeIgniter\I18n\Time;
 
 class Login extends BaseController
 {
@@ -31,7 +32,7 @@ class Login extends BaseController
         if ($auth) {
             session()->set([
                 'isLoggedIn'  => true,
-                'justLoggedIn'=> true,
+                'justLoggedIn' => true,
                 'uuid'        => $auth['uuid'],
                 'name'        => $auth['name'],
                 'level_info'  => $auth['info'],
@@ -56,9 +57,10 @@ class Login extends BaseController
             $doValid = $this->validate([
                 'username' => [
                     'label'  => 'Username',
-                    'rules'  => 'required',
+                    'rules'  => 'required|is_not_unique[users.username]',
                     'errors' => [
                         'required'  => '{field} Can\'t be empty',
+                        'is_not_unique' => 'Username doesn\'t exist.'
                     ]
                 ],
                 'password' => [
@@ -82,7 +84,7 @@ class Login extends BaseController
                 if ($auth) {
                     session()->set([
                         'isLoggedIn'  => true,
-                        'justLoggedIn'=> true,
+                        'justLoggedIn' => true,
                         'uuid'        => $auth['uuid'],
                         'name'        => $auth['name'],
                         'level_info'  => $auth['info'],
@@ -99,7 +101,7 @@ class Login extends BaseController
 
                     $msg = ['success' => 'Login Successful'];
                 } else {
-                    $msg = ['failed' => 'Login Credential Doesn\'t Match'];
+                    $msg = ['failed' => 'Password is Incorrect'];
                 }
             }
 
@@ -107,12 +109,126 @@ class Login extends BaseController
         }
     }
 
+    public function username()
+    {
+        return view('login/usernameAuth');
+    }
+
+    public function verifyUsername()
+    {
+        $username = $this->request->getPost('username');
+        $row = $this->users->where('username', $username)->get()->getRowArray();
+        $validation = \Config\Services::validation();
+
+        $doValid = $this->validate([
+            'username' => [
+                'label'  => 'Username',
+                'rules'  => 'required|is_not_unique[users.username]',
+                'errors' => [
+                    'required' => '{field} Can\'t be Empty',
+                    'is_not_unique' => 'Can\'t find {field} in the system'
+                ]
+            ]
+        ]);
+
+        if (!$doValid) {
+            $msg = [
+                'error' => [
+                    'errorUsername' => $validation->getError('username')
+                ]
+            ];
+        } else {
+            $msg = [
+                'success' => 'success',
+                'data' => [
+                    'uuid' => $row['uuid']
+                ]
+            ];
+        }
+        echo json_encode($msg);
+    }
+
+    public function changePassword($uuid)
+    {
+        $row = $this->users->where('uuid', $uuid)->get()->getRowArray();
+        $data = [
+            'uuid' => $row['uuid']
+        ];
+
+        return view('login/changePassword', $data);
+    }
+    public function updatePassword()
+    {
+        $oldPassword = $this->request->getPost('oldPassword');
+        $newPassword = $this->request->getPost('newPassword');
+        $uuid = $this->request->getPost('uuid');
+        $user = $this->users->where('uuid', $uuid)->get()->getRowArray();
+
+        $validation = \Config\Services::validation();
+
+        $doValid = $this->validate([
+            'oldPassword' => [
+                'label'  => 'Old Password',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} Can\'t be Empty'
+                ]
+            ],
+            'newPassword' => [
+                'label'  => 'New Password',
+                'rules' => 'required|min_length[8]|max_length[20]|regex_match[/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/]',
+                'errors' => [
+                    'required' => 'The {field} field is required.',
+                    'min_length' => 'Password must be at least 8 characters long.',
+                    'max_length' => 'Password cannot exceed 20 characters.',
+                    'regex_match' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                ],
+            ],
+            'confirmPassword' => [
+                'label'  => 'Confirm Password',
+                'rules'  => 'required|matches[newPassword]',
+                'errors' => [
+                    'matches' => 'Password doesn\'t match',
+                    'required' => '{field} Can\'t be Empty'
+                ]
+            ]
+        ]);
+
+        if (!$doValid) {
+            $msg = [
+                'error' => [
+                    'errorOldPassword' => $validation->getError('oldPassword'),
+                    'errorNewPassword' => $validation->getError('newPassword'),
+                    'errorConfirmPassword' => $validation->getError('confirmPassword')
+                ]
+            ];
+        } else {
+            if (!password_verify($oldPassword, $user['password'])) {
+                $msg = [
+                    'failed' => 'The Old Password is incorrect'
+                ];
+            } else {
+                if ($user) {
+                    $this->users->update($uuid, [
+                        'password' => password_hash($newPassword, PASSWORD_DEFAULT),
+                        'updated_at' => Time::now(),
+                    ]);
+                }
+
+                $msg = [
+                    'success' => 'Password Is Successfully Changed'
+                ];
+            }
+        }
+
+        echo json_encode($msg);
+    }
+
     public function isLoggedIn()
     {
         $justLoggedIn = session()->get('justLoggedIn');
         $msg = '';
-        if($justLoggedIn == True)
-        {
+        if ($justLoggedIn == True) {
             session()->remove('justLoggedIn');
             $msg = [
                 'login' => 'Welcome to Ardi Mart'
