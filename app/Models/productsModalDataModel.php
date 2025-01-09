@@ -5,12 +5,12 @@ namespace App\Models;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\Model;
 
-class productsDataModel extends Model
+class productsModalDataModel extends Model
 {
-    protected $table = "products";
-    protected $column_order = array(null, 'barcode', 'product', 'category', 'unit', 'image', 'purchase_price', 'sell_price', 'stocks', null);
-    protected $column_search = array('barcode', 'products.name', 'categories.name');
-    protected $order = array('barcode' => 'ASC');
+    protected $table = 'products';
+    protected $column_order = array(null, 'barcode', 'name', 'category_name', 'stocks', 'sell_price', null);
+    protected $column_search = array('barcode', 'products.name');
+    protected $order = array('name' => 'DESC');
     protected $request;
     protected $db;
     protected $dt;
@@ -22,14 +22,19 @@ class productsDataModel extends Model
         $this->request = $request;
     }
 
-    private function _get_datatables_query()
+    private function _get_datatables_query($keyword)
     {
-        $today = date('Y-m-d');
-        $this->dt = $this->db->table($this->table)
-            ->select('products.*, products.name AS product, categories.name AS category, units.name AS unit')
+        if (strlen($keyword) == 0 ) {
+            $this->dt = $this->db->table($this->table)
+            ->select('products.*, categories.name as category_name')
+            ->join('categories', 'categories.id = products.category_id');
+        } else {
+            $this->dt = $this->db->table($this->table)
+            ->select('products.*, categories.name as category_name')
             ->join('categories', 'categories.id = products.category_id')
-            ->join('units', 'units.id = products.unit_id');
-
+            ->like('barcode', $keyword)->orLike('products.name', $keyword);
+        }
+        
         $i = 0;
         foreach ($this->column_search as $item) {
             if ($this->request->getPost('search')['value']) {
@@ -39,8 +44,9 @@ class productsDataModel extends Model
                 } else {
                     $this->dt->orLike($item, $this->request->getPost('search')['value']);
                 }
-                if (count($this->column_search) - 1 == $i)
+                if (count($this->column_search) - 1 == $i) {
                     $this->dt->groupEnd();
+                }
             }
             $i++;
         }
@@ -56,28 +62,36 @@ class productsDataModel extends Model
         }
     }
 
-    public function get_datatables()
+    public function get_datatables($keyword)
     {
-        $this->_get_datatables_query();
+        $this->_get_datatables_query($keyword);
+
         if ($this->request->getPost('length') != -1) {
             $this->dt->limit($this->request->getPost('length'), $this->request->getPost('start'));
         }
+
         $query = $this->dt->get();
         return $query->getResult();
     }
 
-    public function count_filtered()
+    public function count_filtered($keyword)
     {
-        $this->_get_datatables_query();
+        $this->_get_datatables_query($keyword);
         return $this->dt->countAllResults();
     }
 
-    public function count_all()
+    public function count_all($keyword)
     {
-        $tbl_storage = $this->db->table($this->table)
-            ->select('products.*, products.name AS product, categories.name AS category, units.name AS unit')
+        if (strlen($keyword) == 0 ) {
+            $tbl_storage = $this->db->table($this->table)
+            ->select('products.*, categories.name as category_name')
+            ->join('categories', 'categories.id = products.category_id');
+        } else {
+            $tbl_storage = $this->db->table($this->table)
+            ->select('products.*, categories.name as category_name')
             ->join('categories', 'categories.id = products.category_id')
-            ->join('units', 'units.id = products.unit_id');
+            ->like('barcode', $keyword)->orLike('products.name', $keyword);
+        }
         return $tbl_storage->countAllResults();
     }
 }

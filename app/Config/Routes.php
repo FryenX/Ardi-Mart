@@ -17,12 +17,14 @@ $routes->post('login/auth', 'Login::auth');
 $routes->post('login/logout', 'Login::logout');
 $routes->get('login/rememberMe', 'Login::rememberMe');
 $routes->get('login/username', 'Login::username');
-$routes->get('login/forget', 'Login::forgetPassword');
+$routes->get('login/forget', 'Login::emailAuth');
 $routes->get('login/change/(:any)', 'Login::changePassword/$1');
+$routes->get('login/confirmEmail', 'Login::confirmEmail');
 $routes->post('login/verifyUsername', 'Login::verifyUsername');
 $routes->post('login/changePassword', 'Login::changePassword');
 $routes->post('login/updatePassword', 'Login::updatePassword');
 $routes->post('login/rememberMe', 'Login::rememberMe');
+$routes->post('login/verifyEmail', 'Login::verifyEmail');
 $routes->get('login/isLoggedIn', 'Login::isLoggedIn');
 
 // Users
@@ -71,6 +73,8 @@ $routes->post('products/saveData', 'Products::saveData');
 $routes->post('products/delete', 'Products::delete');
 $routes->get('products/edit/(:any)', 'Products::edit/$1');
 $routes->post('products/update', 'Products::updateData');
+$routes->post('products/showProductsData', 'Products::showProductsData');
+$routes->get('products/showProductsData', 'Products::showProductsData');
 
 // Levels
 $routes->get('levels', 'levels::index');
@@ -99,5 +103,8 @@ $routes->get('transactions/printInvoice', 'Transactions::printInvoice');
 $routes->post('transactions/printInvoice', 'Transactions::printInvoice');
 $routes->get('transactions/data', 'Transactions::data');
 $routes->post('transactions/showTransactionsData', 'Transactions::showTransactionsData');
+$routes->get('transactions/showTransactionsData', 'Transactions::showTransactionsData');
+$routes->get('transactions/exportToCSV', 'Transactions::exportToCSV');
+$routes->post('transactions/exportToCSV', 'Transactions::exportToCSV');
 
 $routes->set404Override();

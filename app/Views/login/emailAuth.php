@@ -34,25 +34,25 @@
                                 <h3 class="mb-0 text-center" style="font-weight: 900; font-size: 2rem;">Forget Password?</h3>
                             </div>
 
-                            <?= form_open('', ['id' => 'formAuth']) ?>
+                            <?= form_open('', ['id' => 'formEmail']) ?>
                             <?= csrf_field() ?>
                             <div style="height: 70px;">
                                 <div class="form-outline mb-4 d-flex">
                                     <div class="input-group">
-                                        <input type="text" name="email" id="email" class="form-control" placeholder="Enter Your Email">
+                                        <input type="email" name="email" id="email" class="form-control" placeholder="Enter Your Email">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <i class="fa fa-user"></i>
                                             </div>
                                         </div>
-                                        <div id="errorUsername" class="invalid-feedback" style="display: none;">
+                                        <div id="errorEmail" class="invalid-feedback" style="display: none;">
                                         </div>
                                         <div class="valid-feedback" style="display: none;">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn btn-primary btn-lg btn-block" id="reset" type="submit">Reset</button>
+                            <button class="btn btn-primary btn-lg btn-block" id="login" type="submit">Send Link</button>
                             <?= form_close() ?>
                         </div>
                     </div>
@@ -70,15 +70,16 @@
     <script>
         $('#login').click(function(e) {
             e.preventDefault();
-
-            let form = $('#formAuth')[0];
+            let email = $('#email').val();
+            let form = $('#formEmail')[0];
             let data = new FormData(form);
 
             $.ajax({
                 type: "post",
-                url: "<?= site_url('login/auth') ?>",
+                url: "<?= site_url('login/verifyEmail') ?>",
                 data: data,
                 dataType: "json",
+                enctype: 'multipart/form-data',
                 processData: false,
                 contentType: false,
                 cache: false,
@@ -88,65 +89,28 @@
                 },
                 complete: function() {
                     $('#login').prop('disabled', false)
-                    $('#login').html('Login')
+                    $('#login').html('Send Link')
                 },
                 success: function(response) {
                     if (response.error) {
                         let dataError = response.error;
-                        if (dataError.errorUserName) {
-                            $('#errorUsername').html(dataError.errorUserName).show();
-                            $('#username').addClass('is-invalid');
+                        if (dataError.errorEmail) {
+                            $('#errorEmail').html(dataError.errorEmail).show();
+                            $('#email').addClass('is-invalid');
                         } else {
-                            $('#errorUsername').fadeOut();
-                            $('#username').removeClass('is-invalid').addClass('is-valid');
-                        }
-                        if (dataError.errorPassword) {
-                            $('#errorPassword').html(dataError.errorPassword).show();
-                            $('#password').addClass('is-invalid');
-                        } else {
-                            $('#errorPassword').fadeOut();
-                            $('#password').removeClass('is-invalid').addClass('is-valid');
+                            $('#errorEmail').fadeOut();
+                            $('#email').removeClass('is-invalid').addClass('is-valid');
                         }
                     } else {
                         if (response.success) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Success!",
-                                html: response.success
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location = '<?= site_url('/') ?>'
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                html: response.failed,
-                            }).then((result) => {
-                                if (result.isConfirmed) {}
-                            });
+                            window.location = `<?= site_url('login/confirmEmail') ?>`;
                         }
-
                     }
                 },
                 error: function(xhr, thrownError) {
                     alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
                 }
             });
-        });
-
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            var passwordField = document.getElementById('password');
-            var passwordFieldType = passwordField.type;
-
-            if (passwordFieldType === 'password') {
-                passwordField.type = 'text';
-                this.innerHTML = '<i class="bi bi-eye"></i>';
-            } else {
-                passwordField.type = 'password';
-                this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-            }
         });
     </script>
 </body>

@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>No</th>
-            <th>Code</th>
+            <th>Barcode</th>
             <th>Product</th>
             <th>Qty</th>
             <th>Price</th>

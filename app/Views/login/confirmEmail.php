@@ -33,34 +33,19 @@
                                 </button>
                                 <h3 class="mb-0 text-center" style="font-weight: 900; font-size: 2rem;">Change Password</h3>
                             </div>
-
-                            <?= form_open('', ['id' => 'formUsername']) ?>
-                            <?= csrf_field() ?>
                             <div style="height: 60px;">
                                 <div class="form-outline mb-4 d-flex">
-                                    <div class="input-group">
-                                        <input type="text" name="username" id="username" class="form-control" placeholder="Enter Your Username">
-                                        <div class="input-group-append">
-                                            <div class="input-group-text">
-                                                <i class="fa fa-user"></i>
-                                            </div>
-                                        </div>
-                                        <div id="errorUsername" class="invalid-feedback" style="display: none;">
-                                        </div>
-                                        <div class="valid-feedback" style="display: none;">
-                                        </div>
-                                    </div>
+                                    We've been sending a reset token to your email please check your email
+                                    by clicking on link below
                                 </div>
                             </div>
                             <div class="justify-content-between d-flex">
                                 <div class="form-check d-flex justify-content-end ">
                                 </div>
                                 <div class="mb-3">
-                                    <a href="<?= base_url('login/forget') ?>">Forgot Password?</a>
                                 </div>
                             </div>
-                            <button class="btn btn-primary btn-lg btn-block" id="login" type="submit">Reset</button>
-                            <?= form_close() ?>
+                            <button class="btn btn-primary btn-lg btn-block" id="login" onclick="window.location='https://mail.google.com'">Open Gmail</button>
                         </div>
                     </div>
                 </div>
@@ -75,50 +60,7 @@
     <!-- AdminLTE App -->
     <script src="<?= base_url('assets') ?>/dist/js/adminlte.min.js?v=3.2.0"></script>
     <script>
-        $('#login').click(function(e) {
-            e.preventDefault();
-            let username = $('#username').val();
-            let form = $('#formUsername')[0];
-            let data = new FormData(form);
 
-            $.ajax({
-                type: "post",
-                url: "<?= site_url('login/verifyUsername') ?>",
-                data: data,
-                dataType: "json",
-                enctype: 'multipart/form-data',
-                processData: false,
-                contentType: false,
-                cache: false,
-                beforeSend: function() {
-                    $('#login').prop('disabled', true)
-                    $('#login').html('<i class="fa fa-spin fa-spinner"></i>')
-                },
-                complete: function() {
-                    $('#login').prop('disabled', false)
-                    $('#login').html('Reset')
-                },
-                success: function(response) {
-                    if (response.error) {
-                        let dataError = response.error;
-                        if (dataError.errorUsername) {
-                            $('#errorUsername').html(dataError.errorUsername).show();
-                            $('#username').addClass('is-invalid');
-                        } else {
-                            $('#errorUsername').fadeOut();
-                            $('#username').removeClass('is-invalid').addClass('is-valid');
-                        }
-                    } else {
-                        if (response.success) {
-                            window.location = `<?= site_url('login/change') ?>/${response.data['uuid']}`;
-                        }
-                    }
-                },
-                error: function(xhr, thrownError) {
-                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
-                }
-            });
-        });
     </script>
 </body>
 

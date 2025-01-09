@@ -132,9 +132,9 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="image" class="col-sm-4 col-form-label">Upload Image (<i>optional</i>)</label>
+            <label for="updateImage" class="col-sm-4 col-form-label">Upload Image (<i>optional</i>)</label>
             <div class="col-sm-4">
-                <input type="file" class="form-control-file" id="image" name="image" style="text-align: right;">
+                <input type="file" class="form-control-file" id="updateImage" name="updateImage" style="text-align: right;">
                 <div id="errorUploadImage" class="invalid-feedback" style="display: none;">
                 </div>
             </div>
@@ -154,6 +154,56 @@
 <div id="viewModal" style="display: none;"></div>
 
 <script>
+    $(document).ready(function() {
+        $('#addUnit').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "<?= site_url('units/add') ?>",
+                dataType: "json",
+                type: "post",
+                data: {
+                    action: 0
+                },
+                success: function(response) {
+                    if (response.data) {
+                        $('#viewModal').html(response.data).show();
+                        $('#modalAddForm').on('shown.bs.modal', function(event) {
+                            $('#name').focus();
+                        })
+                        $('#modalAddForm').modal('show');
+                    }
+                },
+                error: function(xhr, thrownError) {
+                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                }
+            });
+        });
+    });
+    $(document).ready(function() {
+        $('#addCategory').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "<?= site_url('categories/add') ?>",
+                dataType: "json",
+                type: "post",
+                data: {
+                    action: 0
+                },
+                success: function(response) {
+                    if (response.data) {
+                        $('#viewModal').html(response.data).show();
+                        $('#modalAddForm').on('shown.bs.modal', function(event) {
+                            $('#name').focus();
+                        })
+                        $('#modalAddForm').modal('show');
+                    }
+                },
+                error: function(xhr, thrownError) {
+                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                }
+            });
+        });
+    });
     $('#purchase_price').autoNumeric('init', {
         aSep: ',',
         aDec: '.',
@@ -170,7 +220,7 @@
         mDec: '2',
     })
 
-    document.getElementById('image').addEventListener('change', function(event) {
+    document.getElementById('updateImage').addEventListener('change', function(event) {
         const file = event.target.files[0];
         const previewImage = document.getElementById('previewImage');
         const previewLabel = document.getElementById('previewLabel');
@@ -246,6 +296,13 @@
                         $('#errorSellPrice').fadeOut();
                         $('#sell_price').removeClass('is-invalid').addClass('is-valid');
                     }
+                    if (dataError.errorUploadImage) {
+                        $('#errorUploadImage').html(dataError.errorUploadImage).show();
+                        $('#updateImage').addClass('is-invalid');
+                    } else {
+                        $('#errorUploadImage').fadeOut();
+                        $('#updateImage').removeClass('is-invalid').addClass('is-valid');
+                    }
                 } else {
                     Swal.fire({
                         icon: "success",
@@ -253,7 +310,7 @@
                         html: response.success
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location='<?= site_url('products')?>';
+                            window.location = '<?= site_url('products') ?>';
                         }
                     });
                 }
@@ -277,7 +334,7 @@
         };
         img.src = currentImageSrc;
 
-        var imageInput = document.getElementById('image');
+        var imageInput = document.getElementById('updateImage');
         var previewImage = document.getElementById('previewImage');
         var previewLabel = document.getElementById('previewLabel');
 

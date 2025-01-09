@@ -32,83 +32,50 @@ use Picqer\Barcode\BarcodeGeneratorSVG; ?>
         </div>
     </div>
     <div class="card-body">
-        <div class="table-responsive">
-            <?= form_open('products/index'); ?>
-            <?= csrf_field(); ?>
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Search Barcode / Products" value="<?= $search ? $search : '' ?>" name="searchProduct" autofocus>
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit" name="searchProductBtn" id="button-addon2">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </div>
-            </div>
-            <?= form_close(); ?>
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Barcode</th>
-                        <th>Product Name</th>
-                        <th>Categories</th>
-                        <th>Units</th>
-                        <th>Image</th>
-                        <th>Purchase Price (IDR)</th>
-                        <th>Sell Price (IDR)</th>
-                        <th>Stock</th>
-                        <th>#</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    require '../vendor/autoload.php';
-                    $num = 1 + (($pagenumber - 1) * 10);
-                    foreach ($query as $row):
-                    ?>
-                        <tr>
-                            <td><?= $num++ ?></td>
-                            <td>
-                                <?php
-                                $generator = new BarcodeGeneratorSVG();
-                                $fileName = "barcode" . $num . ".svg";
-                                file_put_contents($fileName, $generator->getBarcode($row['barcode'], $generator::TYPE_EAN_13, 2, 50));
-                                ?>
-
-                                <!-- Barcode Image -->
-                                <img src="<?= $fileName ?>" alt="Barcode" style="display: block; margin: 0 auto;">
-
-                                <!-- Barcode Text -->
-                                <span style="display: block; text-align: center; margin-top: 5px;">
-                                    <?= $row['barcode'] ?>
-                                </span>
-                            </td>
-                            <td><?= $row['name'] ?></td>
-                            <td><?= $row['category_name'] ?></td>
-                            <td><?= $row['unit_name'] ?></td>
-                            <td class="text-center justify-content-center"><img src="<?= $row['image'] ?>" class="img-fluid text-center" style="width: 200px;" alt=""></td>
-                            <td style="text-align: right;"><?= number_format($row['sell_price'], 2, ",", ".") ?></td>
-                            <td style="text-align: right;"><?= number_format($row['purchase_price'], 2, ",", ".")  ?></td>
-                            <td style="text-align: right;"><?= number_format($row['stocks'], 2, ",", ".") ?></td>
-                            <td>
-                                <button class="btn btn-outline-success" onclick="window.location='products/edit/<?= $row['barcode'] ?>'">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                                <button class="btn btn-outline-danger" onclick="deleteItem('<?= $row['barcode'] ?>', '<?= $row['name'] ?>')">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-center">
-                <?= $pager_products->links('products', 'paging_data'); ?>
-            </div>
-        </div>
+        <table id="productsData" class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th style="width: 3%;">No</th>
+                    <th style="width: 10%;">Barcode</th>
+                    <th style="width: 10%;">Product Name</th>
+                    <th style="width: 8%;">Categories</th>
+                    <th style="width: 6%;">Units</th>
+                    <th style="width: 15%;">Image</th>
+                    <th style="width: 10%;">Purchase Price (IDR)</th>
+                    <th style="width: 10%;">Sell Price (IDR)</th>
+                    <th style="width: 5%;">Stock</th>
+                    <th style="width: 12%;">#</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
 </div>
 <div id="viewmodal" style="display: none;"></div>
 <script>
+    $(document).ready(function() {
+        showProductsData();
+    });
+
+    function showProductsData() {
+        var table = $('#productsData').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "autoWidth": false,
+            "responsive": true,
+            "order": [],
+            "ajax": {
+                "url": "<?= site_url('products/showProductsData') ?>",
+                "type": "POST"
+            },
+            "columnDefs": [{
+                "targets": [0, 2],
+                "orderable": false,
+            }, ],
+        });
+    }
+
     function deleteItem(code, name) {
         Swal.fire({
             title: "Delete this Product?",

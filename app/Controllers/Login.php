@@ -237,9 +237,83 @@ class Login extends BaseController
         echo json_encode($msg);
     }
 
-    public function forgetPassword()
+    public function emailAuth()
     {
-        return view('login/forgetPassword');
+        return view('login/emailAuth');
+    }
+
+    public function verifyEmail()
+    {
+        $email = $this->request->getPost('email');
+        $row = $this->users->where('email', $email)->get()->getRowArray();
+        $validation = \Config\Services::validation();
+
+        $doValid = $this->validate([
+            'email' => [
+                'label'  => 'Email',
+                'rules'  => 'required|valid_email',
+                'errors' => [
+                    'required'    => '{field} Can\'t be Empty',
+                    'valid_email' => '{field} is not valid',
+                ]
+            ]
+        ]);
+
+        if (!$doValid) {
+            $msg = [
+                'error' => [
+                    'errorEmail' => $validation->getError('email')
+                ]
+            ];
+        } else {
+            if (!empty($row)) {
+                $this->users->update($row['uuid'], [
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+                $to = $email;
+                $subject = 'Reset Password Link';
+                $token = $row['uuid'];
+                $message = 'Hi ' . $row['name'] . '<br/><br/>'
+                    . 'Your Reset Password Token has been received. Please click '
+                    . 'the link below to reset your password. <br/><br/>'
+                    . '<a href="' . base_url() . 'login/resetPassword/' . $token . '">Click Me</a>';
+
+                $emailService = \Config\Services::email();
+                $emailService->setTo($to);
+                $emailService->setFrom('ardiwidana.gg@gmail.com', 'Ardi-Mart');
+                $emailService->setSubject($subject);
+                $emailService->setMessage($message);
+                
+                if ($emailService->send()) {
+                    $msg = [
+                        'success' => 'Email sent successfully!'
+                    ];
+                } else {
+                    log_message('error', 'Email sending failed: ' . $emailService->printDebugger());
+                    echo $emailService->printDebugger();
+                    $msg = [
+                        'error' => [
+                            'errorEmail' => 'Failed to send email. Please try again.' . $emailService->printDebugger()
+                        ]
+                    ];
+                }
+            } else {
+                $msg = [
+                    'error' => [
+                        'errorEmail' => 'Email not found in the system.'
+                    ]
+                ];
+            }
+        }
+
+        echo json_encode($msg);
+    }
+
+
+    public function confirmEmail()
+    {
+        return view('login/confirmEmail');
     }
 
     public function logout()

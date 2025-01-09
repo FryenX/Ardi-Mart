@@ -5,6 +5,12 @@ namespace App\Controllers;
 use App\Models\productsModel;
 use App\Models\unitsModel;
 use App\Models\CategoriesModel;
+use App\Models\productsDataModel;
+use Config\Services;
+
+require '../vendor/autoload.php';
+
+use Picqer\Barcode\BarcodeGeneratorSVG;
 
 class Products extends BaseController
 {
@@ -20,25 +26,54 @@ class Products extends BaseController
     }
     public function index()
     {
-        $searchBtn = $this->request->getPost('searchProductBtn');
-        if (isset($searchBtn)) {
-            $search = $this->request->getPost('searchProduct');
-            session()->set('searchProduct', $search);
-            redirect()->to('/products');
-        } else {
-            $search = session()->get('searchProduct');
+        return view('products/data');
+    }
+
+    public function showProductsData()
+    {
+        if ($this->request->isAJAX()) {
+            $request = Services::request();
+            $transactionData = new productsDataModel($request);
+            if ($request->getMethod(true) == 'POST') {
+                $lists = $transactionData->get_datatables();
+                $data = [];
+                $num = $request->getPost("start");
+                $generator = new BarcodeGeneratorSVG();
+                $fileName = "barcode" . $num . ".svg";
+                foreach ($lists as $list) {
+                    $num++;
+                    $row = [];
+                    $row[] = $num;
+                    file_put_contents($fileName, $generator->getBarcode($list->barcode, $generator::TYPE_EAN_13, 2, 50));
+                    $row[] = "<img src='$fileName' alt='Barcode' style='display: block; margin: 0 auto;'>
+                                <span style='display: block; text-align: center; margin-top: 5px;'>
+                                    ". $list->barcode ."
+                                </span>";
+                    $row[] = $list->product;
+                    $row[] = $list->category;
+                    $row[] = $list->unit;
+                    if (!empty($list->image)) {
+                        $imageTag = "<img src='" . $list->image . "' alt='" . htmlspecialchars($list->barcode . " - " . $list->product, ENT_QUOTES, 'UTF-8') . "' class='img-fluid' style='width: 200px; display: block; margin: 0 auto;'>";
+                    } else {
+                        $imageTag = "<div class='text-center text-danger' style='height: 100px; font-weight: 900;'>Image Not Available</div>";
+                    }
+                    $row[] = $imageTag;
+                    $row[] = number_format($list->purchase_price, 0, ",", ".");
+                    $row[] = number_format($list->sell_price, 0, ",", ".");
+                    $row[] = number_format($list->stocks, 0, ",", ".");
+                    $row[] = "<button type=\"button\" class=\"btn btn-sm btn-success\" onclick=\"window.location='products/edit/$list->barcode'\"><i class='fa fa-edit'></i> Edit</button>
+                            <button type=\"button\" class=\"btn btn-sm btn-danger\" onclick=\"deleteItem('" . $list->barcode . "','" . $list->product . "')\"><i class='fa fa-trash-alt'></i> Delete</button>";
+                    $data[] = $row;
+                }
+                $output = [
+                    "draw" => $request->getPost('draw'),
+                    "recordsTotal" => $transactionData->count_all(),
+                    "recordsFiltered" => $transactionData->count_filtered(),
+                    "data" => $data
+                ];
+                echo json_encode($output);
+            }
         }
-
-        $data_products = $search ? $this->products->searchData($search) : $this->products->select(' products.*, categories.name AS category_name, units.name AS unit_name')->join('units', 'units.id=products.unit_id')->join('categories', 'categories.id=products.category_id');
-
-        $pagenumber = $this->request->getVar('page_products') ? $this->request->getVar('page_products') : 1;
-        $data = [
-            'query' => $data_products->paginate(10, 'page_products'),
-            'pager_products' => $data_products->pager,
-            'pagenumber' => $pagenumber,
-            'search' => $search
-        ];
-        return view('products/data', $data);
     }
 
     public function add()
@@ -224,7 +259,7 @@ class Products extends BaseController
     {
         $row = $this->products->find($barcode);
 
-        if($row) {
+        if ($row) {
             $data = [
                 'barcode'           => $row['barcode'],
                 'name'              => $row['name'],
@@ -247,14 +282,14 @@ class Products extends BaseController
     {
         if ($this->request->isAJAX()) {
             $barcode           = $this->request->getVar('barcode');
-            $name              = $this->request->getVar('name'); 
+            $name              = $this->request->getVar('name');
             $unit              = $this->request->getVar('unit');
             $category          = $this->request->getVar('category');
             $stocks            = str_replace(',', '', $this->request->getVar('stocks'));
             $purchase_price    = str_replace(',', '', $this->request->getVar('purchase_price'));
             $sell_price        = str_replace(',', '', $this->request->getVar('sell_price'));
 
-            $validation = \Config\Services::validation();
+            $validation = Services::validation();
 
             $doValid = $this->validate([
                 'name' => [
@@ -287,7 +322,7 @@ class Products extends BaseController
                 ],
                 'upload_image' => [
                     'label' => 'Image',
-                    'rules' => 'mime_in[image,image/png,image/jpeg]|ext_in[image,png,jpg]|is_image[image]',
+                    'rules' => 'mime_in[updateImage,image/png,image/jpeg]|ext_in[updateImage,png,jpg]|is_image[updateImage]',
                 ]
             ]);
 
@@ -302,7 +337,7 @@ class Products extends BaseController
                     ]
                 ];
             } else {
-                $file_upload = $_FILES['image']['name'];
+                $file_upload = $_FILES['updateImage']['name'];
 
                 $rowDataProducts = $this->products->find($barcode);
 
@@ -315,15 +350,15 @@ class Products extends BaseController
                         }
                     }
                     $image_name = "$barcode-$name";
-                    $image_file = $this->request->getFile('image');
+                    $image_file = $this->request->getFile('updateImage');
                     $image_file->move('assets/upload/products/', $image_name . '.' . $image_file->getExtension());
 
-                    $path_image = '/assets/upload/products/' . $image_file->getName();
+                    $path_image = 'assets/upload/products/' . $image_file->getName();
                 } else {
                     $path_image = $rowDataProducts['image'];
                 }
 
-                $this->products->update($barcode,[
+                $this->products->update($barcode, [
                     'barcode' => $barcode,
                     'name' => $name,
                     'unit_id' => $unit,

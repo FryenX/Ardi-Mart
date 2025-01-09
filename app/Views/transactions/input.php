@@ -100,8 +100,8 @@
 <script>
     $(document).ready(function() {
         createInvoice();
-        sumTotal();
         detailTransactionsData();
+        sumTotal();
 
         $('#barcode').keydown(function(e) {
             if (e.keyCode == 13) {
@@ -124,7 +124,7 @@
             mDec: '2',
             vMin: '1',
         });
-    })
+    });
 
     function createInvoice() {
         $.ajax({

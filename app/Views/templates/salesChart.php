@@ -4,17 +4,40 @@
 <canvas id="salesData" style="height: 50vh; width: 80vh;"></canvas>
 
 <?php
+$allMonths = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+];
+
 $months = "";
 $total = "";
 
-foreach ($chart as $row):
-    $month = $row->month;
+// Create a map of month => transactions from the database
+$monthData = [];
+foreach ($chart as $row) {
+    $monthData[$row->month] = $row->transactions;
+}
 
+// Loop through all months and ensure default values if data is missing
+foreach ($allMonths as $month) {
     $months .= "'$month'" . ",";
-
-    $transactions = $row->transactions;
+    $transactions = isset($monthData[$month]) ? $monthData[$month] : 0; // Default to 0
     $total .= "'$transactions'" . ",";
-endforeach;
+}
+
+// Trim trailing commas
+$months = rtrim($months, ",");
+$total = rtrim($total, ",");
 ?>
 
 <script>

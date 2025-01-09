@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-
-use App\Models\productsDataModel;
+use App\Models\productsModalDataModel;
+use App\Models\transactionsDataModel;
 use Config\Services;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\CapabilityProfile;
@@ -23,29 +23,29 @@ class Transactions extends BaseController
 
     public function createInvoice()
     {
-        $session = session();
-        $uuid = $session->get('uuid');
-        $userId = substr($uuid, -3);
-        $date = $this->request->getPost('date');
+        if ($this->request->isAJAX()) {
+            $session = session();
+            $uuid = $session->get('uuid');
+            $userId = substr($uuid, -3);
+            $date = date('Y-m-d');
 
-        $query = $this->db->query("
-        SELECT MAX(invoice) AS noInvoice 
-        FROM transactions 
-        WHERE DATE_FORMAT(date_time, '%Y-%m-%d') = '$date'");
-        $result = $query->getRowArray();
-        $data = $result['noInvoice'];
+            $query = $this->db->query("SELECT MAX(invoice) AS noInvoice FROM transactions WHERE DATE_FORMAT(date_time, '%Y-%m-%d') = '$date'");
+            $result = $query->getRowArray();
+            $data = $result['noInvoice'];
 
-        if ($data) {
-            $lastNum = substr($data, -8, 4);
+            $lastNum = substr($data, -4);
+
             $nextNum = intval($lastNum) + 1;
-        } else {
-            $nextNum = 1;
-        }
 
-        $formattedDate = date('dmy', strtotime($date));
-        $invoice = 'T' . $formattedDate . sprintf('%04s', $nextNum) . 'U' . sprintf('%03s', $userId);
-        $msg = ['invoice' => $invoice];
-        echo json_encode($msg);
+            $formattedNextNum = sprintf('%04s', $nextNum);
+
+            $formattedDate = date('dmy', strtotime($date));
+
+            $invoice = 'T' . $formattedDate . $userId . $formattedNextNum;
+
+            $msg = ['invoice' => $invoice];
+            echo json_encode($msg);
+        }
     }
 
 
@@ -56,7 +56,7 @@ class Transactions extends BaseController
         $tempTransactions = $this->db->table('temp_transactions');
         $query = $tempTransactions->select('temp_transactions.id AS id, temp_transactions.barcode AS barcode, 
         products.name AS product, temp_transactions.sell_price AS sell_price, temp_transactions.qty AS qty, temp_transactions.subtotal AS sub_total')
-            ->join('products', 'temp_transactions.barcode = products.barcode')->like('temp_transactions.invoice', $noInvoice)
+            ->join('products', 'temp_transactions.barcode = products.barcode')->where('temp_transactions.invoice', $noInvoice)
             ->orderBy('temp_transactions.id', 'ASC');
 
         $data = [
@@ -90,7 +90,7 @@ class Transactions extends BaseController
         if ($this->request->isAJAX()) {
             $keyword = $this->request->getPost('keyword');
             $request = Services::request();
-            $productData = new productsDataModel($request);
+            $productData = new productsModalDataModel($request);
             if ($request->getMethod(true) == 'POST') {
                 $lists = $productData->get_datatables($keyword);
                 $data = [];
@@ -377,7 +377,6 @@ class Transactions extends BaseController
 
             // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
             return implode("\n", $hasilBaris) . "\n";
-
         }
 
         $profile = CapabilityProfile::load("simple");
@@ -437,6 +436,42 @@ class Transactions extends BaseController
 
     public function showTransactionsData()
     {
-        
+        if ($this->request->isAJAX()) {
+            $request = Services::request();
+            $transactionData = new transactionsDataModel($request);
+
+            // Use 'date' as the key to match what is sent from JavaScript
+            $date = $this->request->getPost('date'); // Make sure it's 'date' not 'selectedDate'
+
+            if ($request->getMethod(true) == 'POST') {
+                $lists = $transactionData->get_datatables($date); // Pass the date to the model method
+                $data = [];
+                $num = $request->getPost("start");
+                foreach ($lists as $list) {
+                    $num++;
+                    $row = [];
+                    $row[] = $num;
+                    $row[] = $list->invoice;
+                    $row[] = $list->date_time;
+                    $row[] = $list->customer;
+                    $row[] = $list->discount_percent . ' %'; 
+                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->discount_idr, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
+                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->gross_total, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
+                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->net_total, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
+                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->payment_amount, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
+                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->payment_change, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
+                    $data[] = $row;
+                }
+                $output = [
+                    "draw" => $request->getPost('draw'),
+                    "recordsTotal" => $transactionData->count_all($date),
+                    "recordsFiltered" => $transactionData->count_filtered($date),
+                    "data" => $data
+                ];
+                echo json_encode($output);
+            }
+        }
     }
+
+    public function exportToCSV() {}
 }
