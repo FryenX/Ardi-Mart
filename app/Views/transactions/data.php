@@ -58,29 +58,15 @@
     $(document).ready(function() {
         $('#printBtn').click(function(e) {
             e.preventDefault();
-            $.ajax({
-                type: "post",
-                url: "<?= site_url('transactions/exportToCSV') ?>",
-                dataType: "json",
-                success: function(response) {
-                    if (response.success) {
-                        Swal.fire({
-                            title: "Success!",
-                            text: response.success,
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload();
-                            }
-                        });
-                    }
-                },
-                error: function(xhr, thrownError) {
-                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
-                }
-            });
+
+            // Get the selected date value from the input field
+            var selectedDate = $('#calendarDate').val();
+
+            // Redirect to the export URL with the selected date as a query parameter
+            window.location.href = "<?= site_url('transactions/exportToCSV') ?>?selectedDate=" + selectedDate;
         });
     });
+
 
     function showTransactionsData() {
         var table = $('#transactionsData').DataTable({

@@ -4,10 +4,13 @@ namespace App\Controllers;
 
 use App\Models\productsModalDataModel;
 use App\Models\transactionsDataModel;
+use App\Models\transactionsModel;
 use Config\Services;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\CapabilityProfile;
 use Mike42\Escpos\Printer;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 class Transactions extends BaseController
 {
@@ -454,7 +457,7 @@ class Transactions extends BaseController
                     $row[] = $list->invoice;
                     $row[] = $list->date_time;
                     $row[] = $list->customer;
-                    $row[] = $list->discount_percent . ' %'; 
+                    $row[] = $list->discount_percent . ' %';
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->discount_idr, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->gross_total, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->net_total, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
@@ -473,5 +476,64 @@ class Transactions extends BaseController
         }
     }
 
-    public function exportToCSV() {}
+    public function exportToCSV()
+    {
+        // Instantiate the model
+        $transactionData = new transactionsModel();
+        $date = $this->request->getGet('selectedDate'); // Get the selected date from the query string
+
+        // Fetch the data using the model
+        $lists = $transactionData->select('transactions.*, customers.name as customer')
+            ->join('customers', 'customers.id = transactions.customer_id')
+            ->where('DATE(date_time)', $date)
+            ->findAll();
+
+        // Create a new Spreadsheet object
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set the headers for the CSV file
+        $headers = [
+            'No',
+            'Invoice',
+            'Date Time',
+            'Customer',
+            'Discount Percent',
+            'Discount IDR',
+            'Gross Total',
+            'Net Total',
+            'Payment',
+            'Change'
+        ];
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        // Populate the data in the CSV
+        $rowIndex = 2; // Start from the second row
+        $num = 1;
+        foreach ($lists as $list) {
+            $sheet->setCellValue('A' . $rowIndex, $num++);
+            $sheet->setCellValue('B' . $rowIndex, $list['invoice']);
+            $sheet->setCellValue('C' . $rowIndex, $list['date_time']);
+            $sheet->setCellValue('D' . $rowIndex, $list['customer']);
+            $sheet->setCellValue('E' . $rowIndex, $list['discount_percent']); // Raw discount percent
+            $sheet->setCellValue('F' . $rowIndex, $list['discount_idr']); // Raw discount IDR
+            $sheet->setCellValue('G' . $rowIndex, $list['gross_total']); // Raw gross total
+            $sheet->setCellValue('H' . $rowIndex, $list['net_total']); // Raw net total
+            $sheet->setCellValue('I' . $rowIndex, $list['payment_amount']); // Raw payment amount
+            $sheet->setCellValue('J' . $rowIndex, $list['payment_change']); // Raw payment change
+            $rowIndex++;
+        }
+
+        // Set the HTTP headers to force a download of the file
+        $filename = 'transactions_data_' . ($date ?: 'all') . '.csv';
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Create a CSV writer and output the file
+        $writer = new Csv($spreadsheet);
+        $writer->save('php://output');
+
+        exit();
+    }
 }
