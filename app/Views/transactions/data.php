@@ -13,17 +13,37 @@
 <script src="<?= base_url('assets') ?>/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">
-            <i class="fa fa-file-invoice"></i> Transactions
-        </h3>
-        <div class="card-tools d-flex">
-            <input type="date" id="calendarDate" class="form-control" placeholder="Select Date" value="<?= date('Y-m-d'); ?>">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                <i class="fas fa-times"></i>
-            </button>
+        <div class="row">
+            <div class="col-md-4">
+                <h3 class="card-title">
+                    <button type="button" class="btn btn-warning btn-sm mb-3"
+                        onclick="window.location='<?= site_url('transactions') ?>'"><i class="fa fa-backward"></i> Kembali</button>
+                    <br/>
+                    <i class="fa fa-file-invoice"></i> Transactions
+                </h3>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="startDate">Starting Date</label>
+                    <input type="date" id="startDate" class="form-control" value="<?= date('Y-m-d'); ?>">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="endDate">Ending Date</label>
+                    <input type="date" id="endDate" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <div class="card-tools d-flex">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
         </div>
         <?php
         $userLevel = session()->get('level_info');
@@ -43,6 +63,7 @@
                     <th>Net Total</th>
                     <th>Payment Amount</th>
                     <th>Change</th>
+                    <th>Payment Method</th>
                     <?php
                     if ($userLevel == 'Admin' || $userLevel == 'Manager') {
                         echo "<th>#</th>";
@@ -66,11 +87,10 @@
         $('#printBtn').click(function(e) {
             e.preventDefault();
 
-            // Get the selected date value from the input field
-            var selectedDate = $('#calendarDate').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
 
-            // Redirect to the export URL with the selected date as a query parameter
-            window.location.href = "<?= site_url('transactions/exportToCSV') ?>?selectedDate=" + selectedDate;
+            window.location.href = "<?= site_url('transactions/exportToCSV') ?>?startDate=" + startDate + "&endDate=" + endDate;
         });
     });
 
@@ -86,8 +106,10 @@
                 "url": "<?= site_url('transactions/showTransactionsData') ?>",
                 "type": "POST",
                 "data": function(d) {
-                    var selectedDate = $('#calendarDate').val();
-                    d.date = selectedDate;
+                    var startDate = $('#startDate').val();
+                    var endDate = $('#endDate').val();
+                    d.startDate = startDate;
+                    d.endDate = endDate;
                 }
             },
             "columnDefs": [{
@@ -96,7 +118,10 @@
             }],
         });
 
-        $('#calendarDate').on('change', function() {
+        $('#startDate').on('change', function() {
+            table.ajax.reload();
+        });
+        $('#endDate').on('change', function() {
             table.ajax.reload();
         });
     }

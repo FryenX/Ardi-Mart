@@ -138,6 +138,9 @@
         }
     });
 
+    $('#barcode').on('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
     $('#purchase_price').autoNumeric('init', {
         aSep: ',',
         aDec: '.',

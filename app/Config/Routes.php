@@ -30,17 +30,17 @@ $routes->get('login/resetPassword/(:segment)', 'Login::resetPassword/$1', ['filt
 $routes->get('login/isLoggedIn', 'Login::isLoggedIn');
 
 // Users
-$routes->get('/users', 'users::index');
-$routes->get('/users/add', 'users::add');
-$routes->post('/users/saveData', 'users::saveData');
-$routes->post('/users/index', 'users::index');
-$routes->post('/users/edit', 'users::edit');
+$routes->get('users', 'users::index');
+$routes->get('users/add', 'users::add');
+$routes->post('users/saveData', 'users::saveData');
+$routes->post('users/index', 'users::index');
+$routes->post('users/edit', 'users::edit');
 $routes->get('users/edit/(:segment)', 'users::edit/$1', ['filter' => 'UuidFilter']);
 $routes->get('users/changePassword/(:segment)', 'users::changePassword/$1', ['filter' => 'UuidFilter']);
 $routes->post('users/update', 'users::updateData');
 $routes->post('users/updatePassword', 'users::updatePassword');
-$routes->post('/users/delete', 'users::delete');
-$routes->get('/users/index', 'users::index');
+$routes->post('users/delete', 'users::delete');
+$routes->get('users/index', 'users::index');
 $routes->get('users/fetchDataLevels', 'Users::fetchDataLevels');
 $routes->get('profile/(:segment)', 'Users::profile/$1', ['filter' => 'UuidFilter']);
 $routes->get('profile/edit/(:segment)', 'Users::editProfile/$1', ['filter' => 'UuidFilter']);
@@ -103,7 +103,9 @@ $routes->post('transactions/sumTotal', 'Transactions::sumTotal');
 $routes->post('transactions/deleteItem', 'Transactions::deleteItem');
 $routes->post('transactions/cancel', 'Transactions::cancelTransaction');
 $routes->post('transactions/payment', 'Transactions::payment');
+$routes->post('transactions/paymentTransfer', 'Transactions::paymentTransfer');
 $routes->post('transactions/saveData', 'Transactions::saveData');
+$routes->post('transactions/saveTransfer', 'Transactions::saveTransfer');
 $routes->get('transactions/printInvoice', 'Transactions::printInvoice');
 $routes->post('transactions/printInvoice', 'Transactions::printInvoice');
 $routes->get('transactions/data', 'Transactions::data');
@@ -114,3 +116,5 @@ $routes->get('transactions/exportToCSV', 'Transactions::exportToCSV');
 $routes->post('transactions/exportToCSV', 'Transactions::exportToCSV');
 
 $routes->set404Override();
+
+$routes->get('pay', 'Pay::index');

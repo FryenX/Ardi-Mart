@@ -53,7 +53,7 @@ class Products extends BaseController
                     $row[] = $list->category;
                     $row[] = $list->unit;
                     if (!empty($list->image)) {
-                        $imageTag = "<img src='" . $list->image . "' alt='" . htmlspecialchars($list->barcode . " - " . $list->product, ENT_QUOTES, 'UTF-8') . "' class='img-fluid' style='width: 200px; display: block; margin: 0 auto;'>";
+                        $imageTag = "<img  style='height: 100px;' src='" . $list->image . "' alt='" . htmlspecialchars($list->barcode . " - " . $list->product, ENT_QUOTES, 'UTF-8') . "' class='img-fluid d-block mx-auto' style='width: 200px;'>";
                     } else {
                         $imageTag = "<div class='text-center text-danger' style='height: 100px; font-weight: 900;'>Image Not Available</div>";
                     }

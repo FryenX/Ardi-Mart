@@ -10,7 +10,7 @@ class CustomerSeeder extends Seeder
     {
         $data = [
             [
-                'id' => '0',
+                'id' => 0,
                 'name' => '-',
                 'address' => '-',
                 'phone' => '-',

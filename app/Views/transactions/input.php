@@ -9,7 +9,7 @@
 <div class="card card-default color-palette-box">
     <div class="card-header">
         <h3 class="card-title">
-            <button type="button" class="btn btn-warning btn-sm text-white"
+            <button type="button" class="btn btn-warning btn-sm"
                 onclick="window.location='<?= site_url('transactions') ?>'"><i class="fa fa-backward"></i> Kembali</button>
         </h3>
     </div>
@@ -24,9 +24,9 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="date">Date</label>
-                    <input type="date" class="form-control form-control-sm" name="date" id="date" readonly
-                        value="<?= date('Y-m-d'); ?>">
+                    <label for="invoiceDate">Date</label>
+                    <input type="datetime" class="form-control form-control-sm" name="invoiceDate" id="invoiceDate" readonly
+                        value="<?= date('Y-m-d H:i:s'); ?>">
                 </div>
             </div>
             <div class="col-md-3">
@@ -52,7 +52,7 @@
                             <i class="fa fa-trash-alt"></i>
                         </button>&nbsp;
                         <button class="btn btn-success" type="button" id="saveTransactions">
-                            <i class="fa fa-save"></i>
+                            <i class="fa fa-money-bill"></i>
                         </button>&nbsp;
                     </div>
                 </div>
@@ -102,7 +102,7 @@
 </div>
 <div id="viewModal" style="display: none;"></div>
 <div id="viewModalPayment" style="display: none;"></div>
-
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-MfLAGbgCiHH5HmV1LJQIL4BR"></script>
 <script>
     $(document).ready(function() {
         createInvoice();
@@ -382,7 +382,7 @@
             url: "<?= site_url('transactions/payment') ?>",
             data: {
                 invoice: invoice,
-                date: $('#date').val(),
+                invoiceDate: $('#invoiceDate').val(),
                 customer: $('#customer').val()
             },
             dataType: "json",

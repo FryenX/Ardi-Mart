@@ -19,6 +19,7 @@
     <script src="<?= base_url('assets') ?>/plugins/sweetalert2/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="<?= base_url('assets') ?>/plugins/jsgrid/jsgrid.min.css">
     <link rel="stylesheet" href="<?= base_url('assets') ?>/plugins/jsgrid/jsgrid-theme.min.css">
+    <link rel="icon" type="image/png" href="<?= base_url('assets') ?>/upload/icons/icon.png">
 </head>
 
 <body class="hold-transition sidebar-mini">

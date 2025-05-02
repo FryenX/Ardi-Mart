@@ -103,7 +103,7 @@ class Login extends BaseController
                 } else {
                     $msg = ['failed' => 'Password is Incorrect'];
                 }
-            }
+            }                                                                                                                                                                                                                                               
 
             echo json_encode($msg);
         }

@@ -16,7 +16,13 @@ class transactionsModel extends Model
         'discount_percent',
         'discount_idr',
         'gross_total',
-        'net_total'
+        'net_total',
+        'payment_method',
+        'order_id',
+        'payment_type',
+        'va_number',
+        'bank',
+        'status'
     ];
 
     public function getMonthlySalesData($year)

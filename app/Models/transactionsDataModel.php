@@ -8,14 +8,13 @@ use CodeIgniter\Model;
 class transactionsDataModel extends Model
 {
     protected $table = "transactions";
-    protected $column_order = array(null, 'invoice', 'date_time', 'customer', 'discount_percent', 'discount_idr', 'gross_total', 'net_total', 'payment_amount', 'payment_change', null); // Columns for DataTables
-    protected $column_search = array('invoice', 'date_time', 'customers.name'); // Include customers.name for search
+    protected $column_order = array(null, 'invoice', 'date_time', 'customer', 'discount_percent', 'discount_idr', 'gross_total', 'net_total', 'payment_amount', 'payment_change', 'payment_method',null);
+    protected $column_search = array('invoice', 'date_time', 'customers.name');
     protected $order = array('date_time' => 'desc');
     protected $request;
     protected $db;
     protected $dt;
 
-    // Constructor
     public function __construct(RequestInterface $request)
     {
         parent::__construct();
@@ -23,20 +22,17 @@ class transactionsDataModel extends Model
         $this->request = $request;
     }
 
-    // Private function to handle the query building
-    public function _get_datatables_query($date)
+    public function _get_datatables_query($startDate, $endDate)
     {
-        // Start building the base query
         $this->dt = $this->db->table($this->table)
-            ->select('transactions.*, customers.name as customer')  // Select customer field as well
+            ->select('transactions.*, customers.name as customer')
             ->join('customers', 'customers.id = transactions.customer_id');
 
-        // Filter by date if provided
-        if ($date) {
-            $this->dt->where('DATE(date_time)', $date); // Filter by the provided date
+        if ($startDate && $endDate) {
+            $this->dt->where("DATE(date_time) >=", $startDate);
+            $this->dt->where("DATE(date_time) <=", $endDate);
         }
 
-        // Apply search filter if search value exists
         $searchValue = $this->request->getPost('search')['value'];
         if ($searchValue) {
             $i = 0;
@@ -54,7 +50,6 @@ class transactionsDataModel extends Model
             }
         }
 
-        // Order functionality
         if ($this->request->getPost('order')) {
             $this->dt->orderBy(
                 $this->column_order[$this->request->getPost('order')[0]['column']],
@@ -67,38 +62,34 @@ class transactionsDataModel extends Model
     }
 
 
-    // Public function to fetch data for the datatables
-    public function get_datatables($date)
+    public function get_datatables($startDate, $endDate)
     {
-        $this->_get_datatables_query($date);
+        $this->_get_datatables_query($startDate, $endDate);
 
         if ($this->request->getPost('length') != -1) {
             $this->dt->limit($this->request->getPost('length'), $this->request->getPost('start'));
         }
 
-        $query = $this->dt->get();
-        return $query->getResult();
+        return $this->dt->get()->getResult();
     }
 
-    // Function to count filtered records
-    public function count_filtered($date)
+    public function count_filtered($startDate, $endDate)
     {
-        $this->_get_datatables_query($date);
+        $this->_get_datatables_query($startDate, $endDate);
         return $this->dt->countAllResults();
     }
 
-    // Function to count all records
-    public function count_all($date)
+    public function count_all($startDate, $endDate)
     {
-        $query = $this->db->table($this->table)
+        $builder = $this->db->table($this->table)
             ->select('transactions.*, customers.name as customer')
             ->join('customers', 'customers.id = transactions.customer_id');
 
-        // Apply date filter if provided
-        if ($date) {
-            $query->where('DATE(date_time)', $date);
+        if ($startDate && $endDate) {
+            $builder->where("DATE(date_time) >=", $startDate);
+            $builder->where("DATE(date_time) <=", $endDate);
         }
 
-        return $query->countAllResults();
+        return $builder->countAllResults();
     }
 }

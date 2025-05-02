@@ -13,6 +13,7 @@
                 <input type="hidden" name="invoice" value="<?= $invoice ?>">
                 <input type="hidden" name="customer" value="<?= $customer ?>">
                 <input type="hidden" name="gross_total" id="gross_total" value="<?= $net_total ?>">
+                <input type="hidden" name="invoiceDate" id="invoiceDate" value="<?= $invoiceDate ?>">
                 <div class="row">
                     <div class="col">
                         <div class="form-group">
@@ -33,27 +34,162 @@
                         style="text-align: right; color:blue; font-weight : bold; font-size:30pt;" value="<?= $net_total ?>" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="payment">Payment</label>
-                    <input type="text" class="form-control form-control-lg" name="payment" id="payment"
-                        style="text-align: right; color:red; font-weight : bold; font-size:26pt;" autocomplete="off">
+                    <label>Payment</label>
+                    <div class="btn-group d-flex mb-3">
+                        <button type="button" id="btnCash" class="btn btn-outline-primary flex-fill active">Cash</button>
+                        <button type="button" id="btnTransfer" class="btn btn-outline-success flex-fill">Transfer</button>
+                    </div>
+
+                    <div id="cash-form" style="display: block;">
+                        <label for="cash_amount">Enter Cash Amount</label>
+                        <input type="text" class="form-control form-control-lg"
+                            name="cash_amount" id="cash_amount"
+                            style="text-align: right; color:red; font-weight: bold; font-size: 26pt;"
+                            autocomplete="off">
+                    </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="change-wrapper">
                     <label for="change">Change</label>
                     <input type="text" class="form-control form-control-lg" name="change" id="change"
                         style="text-align: right; color:blue; font-weight : bold; font-size:30;" readonly autocomplete="off">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="btnCancel" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="submit" id="btnSave" class="btn btn-success">Save</button>
             </div>
             <?= form_close() ?>
         </div>
     </div>
 </div>
-
 <script>
+    function paymentGateway() {
+        $.ajax({
+            type: "post",
+            url: "<?= site_url('transactions/paymentTransfer') ?>",
+            data: $('#formPayment').serialize(),
+            dataType: "json",
+            success: function(response) {
+                if (response.error) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Error",
+                        html: response.error
+                    });
+                } else {
+                    snap.pay(response.snapToken, {
+                        onSuccess: function(result) {
+                            processTransaction(result, 'success', response);
+                        },
+                        onPending: function(result) {
+                            processTransaction(result, 'pending', response);
+                        },
+                        onError: function(result) {
+                            processTransaction(result, 'error', response);
+                        }
+                    });
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
+    }
+
+    function processTransaction(dataObj, status, serverResponse) {
+        console.log(JSON.stringify(dataObj, null, 2));
+
+        let va_number = '-';
+        let bank = '-';
+
+        if (dataObj.payment_type !== 'qris' && dataObj.va_numbers && dataObj.va_numbers.length > 0) {
+            va_number = dataObj.va_numbers[0].va_number;
+            bank = dataObj.va_numbers[0].bank;
+        }
+
+        let disc_idr = $('#disc_idr').val();
+        let disc_percent = $('#disc_percent').val();
+
+        $.ajax({
+            type: "post",
+            url: "<?= site_url('transactions/saveData') ?>",
+            data: {
+                invoice: serverResponse.invoice,
+                invoiceDate: serverResponse.invoiceDate,
+                customer: serverResponse.customer,
+                gross_total: serverResponse.gross_total,
+                net_total: serverResponse.net_total,
+                order_id: dataObj.order_id,
+                payment_type: dataObj.payment_type,
+                transaction_status: dataObj.transaction_status,
+                va_number: va_number,
+                bank: bank,
+                disc_idr: disc_idr,
+                disc_percent: disc_percent
+            },
+            dataType: "json",
+            success: function(saveResp) {
+                if (saveResp.success) {
+                    $.ajax({
+                        type: "post",
+                        url: "<?= site_url('transactions/printInvoice') ?>",
+                        data: {
+                            invoice: saveResp.invoice
+                        },
+                        success: function(printResp) {
+                            if (printResp.success) {
+                                if (status === 'succ') {
+                                    Swal.fire({
+                                        title: "Printed!",
+                                        html: 'Invoice printed successfully',
+                                        icon: "success"
+                                    }).then(() => {
+                                        window.location.reload();
+                                    });
+                                }
+                            }
+                        },
+                        error: function(xhr, thrownError) {
+                            alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                        }
+                    });
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
+    }
+
     $(document).ready(function() {
+        $(document).ready(function() {
+            $('#btnCash').click(function(e) {
+                e.preventDefault();
+
+                $(this).addClass('active');
+                $('#btnTransfer').removeClass('active');
+
+                $('#cash-form').show();
+                $('#change-wrapper').show();
+                $('#btnSave').prop('disabled', false);
+                $('#btnCancel').prop('disabled', false);
+            });
+
+            $('#btnTransfer').click(function(e) {
+                e.preventDefault();
+
+                $(this).addClass('active');
+                $('#btnCash').removeClass('active');
+
+                countDiscount();
+                $('#cash-form').hide();
+                $('#change-wrapper').hide();
+                $('#btnSave').prop('disabled', true);
+                $('#btnCancel').prop('disabled', true);
+                paymentGateway();
+            });
+        });
+
         const Toast = Swal.mixin({
             toast: true,
             position: "top-end",
@@ -80,7 +216,7 @@
             aDec: '.',
             mDec: '0',
         });
-        $('#payment').autoNumeric('init', {
+        $('#cash_amount').autoNumeric('init', {
             aSep: ',',
             aDec: '.',
             mDec: '0',
@@ -97,17 +233,19 @@
         $('#disc_idr').keyup(function(e) {
             countDiscount();
         });
-        $('#payment').keyup(function(e) {
+        $('#cash_amount').keyup(function(e) {
             countChange();
         });
 
         $('#formPayment').submit(function(e) {
             e.preventDefault();
 
-            let payment = ($('#payment').val() == "") ? 0 : $('#payment').autoNumeric('get');
+            let payment = $('input[name="payment"]:checked').val();
+            let cash_amount = ($('#cash_amount').val() == "") ? 0 : $('#cash_amount').autoNumeric('get');
+            let mid_trans = $('#mid_trans').val();
             let change = ($('#change').val() == "") ? 0 : $('#change').autoNumeric('get');
 
-            if (parseFloat(payment) == 0 || parseFloat(payment) == "") {
+            if (parseFloat(cash_amount) == 0 || parseFloat(cash_amount) == "") {
                 Toast.fire({
                     icon: "error",
                     title: "Please Input Payment Amount First",
@@ -192,9 +330,9 @@
 
     function countChange() {
         let total_payment = $('#net_total').autoNumeric('get');
-        let payment = ($('#payment').val() == "") ? 0 : $('#payment').autoNumeric('get');
+        let cash_amount = ($('#cash_amount').val() == "") ? 0 : $('#cash_amount').autoNumeric('get');
 
-        change = parseFloat(payment) - parseFloat(total_payment);
+        change = parseFloat(cash_amount) - parseFloat(total_payment);
 
         $('#change').val(change);
         let changex = $('#change').val();

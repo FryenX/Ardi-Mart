@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Models\UsersModel;
-use App\Models\LevelsModel;
+use App\Models\usersModel;
+use App\Models\levelsModel;
 use Ramsey\Uuid\Uuid;
 use CodeIgniter\I18n\Time;
 
@@ -70,11 +70,11 @@ class Users extends BaseController
         $uuid = Uuid::uuid4()->toString();
 
         if ($this->request->isAJAX()) {
-            $name     = $this->request->getVar('name');
-            $username = $this->request->getVar('username');
-            $email    = $this->request->getVar('email');
-            $password = $this->request->getVar('password');
-            $level    = $this->request->getVar('level');
+            $name     = $this->request->getPost('name');
+            $username = $this->request->getPost('username');
+            $email    = $this->request->getPost('email');
+            $password = $this->request->getPost('password');
+            $level    = $this->request->getPost('level');
 
             $validation = \Config\Services::validation();
 
@@ -110,7 +110,7 @@ class Users extends BaseController
                         'min_length' => 'Password must be at least 8 characters long.',
                         'max_length' => 'Password cannot exceed 20 characters.',
                         'regex_match' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
-                    ],
+                    ]
                 ],
                 'password_confirm' => [
                     'label' => 'Confirm Password',
@@ -118,14 +118,14 @@ class Users extends BaseController
                     'errors' => [
                         'required' => '{field} Can\'t be Empty',
                         'matches' => 'Password confirmation does not match the password.'
-                    ],
+                    ]
                 ],
                 'level' => [
                     'label' => 'Level',
                     'rules' => 'required',
                     'errors' => [
                         'required' => '{field} Can\'t be Empty',
-                    ],
+                    ]
                 ],
                 'upload_image' => [
                     'label' => 'Image',

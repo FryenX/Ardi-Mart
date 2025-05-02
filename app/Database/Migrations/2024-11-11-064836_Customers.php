@@ -14,6 +14,10 @@ class Customers extends Migration
                 'auto_increment' => true,
                 'null'           => false,
             ],
+            'membership_no' => [
+                'type'           => 'BIGINT',
+                'null'           => false,
+            ],
             'name' => [
                 'type' => 'VARCHAR',
 				'constraint' => '100',
