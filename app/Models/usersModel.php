@@ -19,7 +19,8 @@ class usersModel extends Model
         'password',
         'image',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'reset_password_token'
     ];
 
     public function searchData($search)

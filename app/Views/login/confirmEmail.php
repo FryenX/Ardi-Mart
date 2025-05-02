@@ -28,7 +28,7 @@
 
                         <div class="card-body p-5">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <button type="button" class="btn btn-warning" onclick="window.location='<?= site_url('login') ?>'">
+                                <button type="button" class="btn btn-warning" onclick="redirectTo()">
                                     <i class="fa fa-backward"></i> Back
                                 </button>
                                 <h3 class="mb-0 text-center" style="font-weight: 900; font-size: 2rem;">Change Password</h3>
@@ -45,7 +45,9 @@
                                 <div class="mb-3">
                                 </div>
                             </div>
-                            <button class="btn btn-primary btn-lg btn-block" id="login" onclick="window.location='https://mail.google.com'">Open Gmail</button>
+                            <a href="https://mail.google.com" target="_blank">
+                                <button class="btn btn-primary btn-lg btn-block" id="login">Open Gmail</button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -60,7 +62,17 @@
     <!-- AdminLTE App -->
     <script src="<?= base_url('assets') ?>/dist/js/adminlte.min.js?v=3.2.0"></script>
     <script>
+        function redirectTo() {
+            const uuid = '<?= esc(session()->get('uuid')) ?>'; // Get the uuid from the session
 
+            if (uuid) {
+                // If the session exists, redirect to the profile page with uuid
+                window.location = '<?= site_url('profile/') ?>' + uuid;
+            } else {
+                // If session does not exist, redirect to the login page
+                window.location = '<?= site_url('login') ?>';
+            }
+        }
     </script>
 </body>
 

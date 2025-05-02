@@ -25,7 +25,9 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-
+        <?php
+        $userLevel = session()->get('level_info');
+        ?>
     </div>
     <div class="card-body">
         <table id="transactionsData" class="table table-bordered table-hover display">
@@ -41,6 +43,11 @@
                     <th>Net Total</th>
                     <th>Payment Amount</th>
                     <th>Change</th>
+                    <?php
+                    if ($userLevel == 'Admin' || $userLevel == 'Manager') {
+                        echo "<th>#</th>";
+                    }
+                    ?>
                 </tr>
             </thead>
             <tbody>
@@ -91,6 +98,42 @@
 
         $('#calendarDate').on('change', function() {
             table.ajax.reload();
+        });
+    }
+
+    function deleteData(invoice) {
+        Swal.fire({
+            title: "Delete this transactions?",
+            html: `Are you sure want to delete this data`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "post",
+                    url: "<?= site_url('transactions/delete') ?>",
+                    data: {
+                        invoice: invoice
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: response.success,
+                                icon: "success"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
         });
     }
 </script>

@@ -92,10 +92,28 @@ class Main extends BaseController
         if ($this->request->isAJAX()) {
             $year = $this->request->getPost('year');
 
-            $query = $this->db->query("SELECT products.name AS name, transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') AS year, 
-            COUNT(transactions_detail.barcode) AS qty FROM transactions_detail JOIN transactions ON transactions_detail.invoice = transactions.invoice 
-            JOIN products ON transactions_detail.barcode = products.barcode WHERE DATE_FORMAT(transactions.date_time, '%Y') = '$year' 
-            GROUP BY transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') ORDER BY transactions.date_time ASC;")->getResult();
+            $query = $this->db->query("
+                SELECT 
+                    products.name AS name, 
+                    transactions_detail.barcode, 
+                    DATE_FORMAT(transactions.date_time, '%Y') AS year, 
+                    SUM(transactions_detail.qty) AS qty 
+                FROM 
+                    transactions_detail 
+                JOIN 
+                    transactions 
+                    ON transactions_detail.invoice = transactions.invoice 
+                JOIN 
+                    products 
+                    ON transactions_detail.barcode = products.barcode 
+                WHERE 
+                    DATE_FORMAT(transactions.date_time, '%Y') = '$year' 
+                GROUP BY 
+                    transactions_detail.barcode, DATE_FORMAT(transactions.date_time, '%Y') 
+                ORDER BY 
+                    transactions.date_time ASC;
+            ")->getResult();
+
 
             $data =  [
                 'chart' => $query

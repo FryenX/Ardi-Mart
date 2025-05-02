@@ -73,10 +73,16 @@
                         readonly>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="form-group">
                     <label for="qty">Quantity</label>
                     <input type="number" class="form-control form-control-sm" name="qty" id="qty" value="1" min="1">
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label for="btnAdd">Input</label>
+                    <button class="btn btn-primary form-control" onclick="inputItem()" id="btnAdd">+</button>
                 </div>
             </div>
             <div class="col-md-3">
@@ -102,19 +108,27 @@
         createInvoice();
         detailTransactionsData();
         sumTotal();
+        let barcode = $('#barcode').val();
 
         $('#barcode').keydown(function(e) {
             if (e.keyCode == 13) {
                 e.preventDefault();
                 checkCode();
-                $('#qty').focus().select();
             }
         });
 
-        $('#qty').keydown(function(e) {
-            if (e.keyCode == 13) {
-                e.preventDefault();
-                checkCode();
+        $('#barcode').on('input', function() {
+            let barcode = $(this).val().trim();
+
+            if (barcode.length > 0) {
+                $('#qty').off('keydown').on('keydown', function(e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                        inputItem();
+                    }
+                });
+            } else {
+                $('#qty').off('keydown');
             }
         });
 
@@ -134,8 +148,8 @@
                 date: $('#date').val()
             },
             dataType: "json",
-            success: function (response) {
-                if(response.invoice) {
+            success: function(response) {
+                if (response.invoice) {
                     $('#invoice').val(response.invoice);
                 }
             },
@@ -187,12 +201,9 @@
         } else {
             $.ajax({
                 type: "post",
-                url: "<?= site_url('transactions/saveTemp') ?>",
+                url: "<?= site_url('transactions/checkCode') ?>",
                 data: {
                     barcode: barcode,
-                    name: $('#product').val(),
-                    qty: $('#qty').val(),
-                    invoice: $('#invoice').val()
                 },
                 dataType: "json",
                 success: function(response) {
@@ -214,8 +225,9 @@
                         });
                     }
                     if (response.success == 'Success') {
-                        detailTransactionsData();
-                        empty();
+                        $('#barcode').val(response.data.barcode)
+                        $('#product').val(response.data.product)
+                        $('#qty').select();
                     }
                     if (response.error) {
                         Swal.fire({
@@ -232,6 +244,37 @@
                 }
             });
         }
+    }
+
+    function inputItem() {
+
+        $.ajax({
+            type: "post",
+            url: "<?= site_url('transactions/saveTemp') ?>",
+            data: {
+                invoice: $('#invoice').val(),
+                barcode: $('#barcode').val(),
+                product: $('#product').val(),
+                qty: $('#qty').val()
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.success == 'Success') {
+                    detailTransactionsData();
+                    empty();
+                }
+                if (response.error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        html: response.error
+                    });
+                }
+            },
+            error: function(xhr, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+        });
     }
 
     function empty() {

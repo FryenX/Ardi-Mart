@@ -2,7 +2,6 @@
 
 namespace Config;
 
-use App\Filters\ManagerFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -38,7 +37,8 @@ class Filters extends BaseFilters
         'auth'          => \App\Filters\AuthFilter::class,
         'userLevel'     => \App\Filters\UserLevelFilter::class,
         'managerFilter' => \App\Filters\ManagerFilter::class,
-        'UuidFilter'    => \App\Filters\UuidFilter::class
+        'UuidFilter'    => \App\Filters\UuidFilter::class,
+        'TokenFilter'   => \App\Filters\TokenFilter::class
     ];
 
     /**
@@ -77,7 +77,21 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
-            'auth' => ['except' => ['login', 'login/auth', 'login/rememberMe', 'login/forget', 'login/change', 'login/username', 'login/change/*', 'login/verifyUsername', 'login/updatePassword', 'login/verifyEmail', 'login/confirmEmail']],
+            'auth' => ['except' => [
+                'login',
+                'login/auth',
+                'login/rememberMe',
+                'login/forget',
+                'login/change',
+                'login/credential',
+                'login/change/*',
+                'login/verifyCredential',
+                'login/updatePassword',
+                'login/verifyEmail',
+                'login/confirmEmail',
+                'login/resetPassword/*',
+                'login/newPassword'
+            ]],
         ],
         'after' => [
             // 'honeypot',
@@ -98,9 +112,7 @@ class Filters extends BaseFilters
      *
      * @var array<string, list<string>>
      */
-    public array $methods = [
-        
-    ];
+    public array $methods = [];
 
     /**
      * List of filter aliases that should run on any

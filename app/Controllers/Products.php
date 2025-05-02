@@ -128,7 +128,7 @@ class Products extends BaseController
             $purchase_price    = str_replace(',', '', $this->request->getVar('purchase_price'));
             $sell_price        = str_replace(',', '', $this->request->getVar('sell_price'));
 
-            $validation = \Config\Services::validation();
+            $validation = Services::validation();
 
             $doValid = $this->validate([
                 'barcode' => [

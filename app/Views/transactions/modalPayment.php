@@ -150,8 +150,13 @@
                                             invoice: response.invoice
                                         },
                                         success: function(response) {
-                                            alert(response);
-                                            window.location.reload();
+                                            Swal.fire({
+                                                title: "Printed!",
+                                                html: 'Invoice printed successfully',
+                                                icon: "success"
+                                            }).then((result) => {
+                                                window.location.reload();
+                                            });
                                         },
                                         error: function(xhr, thrownError) {
                                             alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);

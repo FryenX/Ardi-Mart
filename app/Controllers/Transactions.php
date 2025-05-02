@@ -121,20 +121,12 @@ class Transactions extends BaseController
         }
     }
 
-    public function saveTemp()
+    public function checkCode()
     {
         if ($this->request->isAJAX()) {
             $barcode = $this->request->getVar('barcode');
-            $name = $this->request->getVar('name');
-            $qty = $this->request->getVar('qty');
-            $invoice = $this->request->getVar('invoice');
 
-            if (strlen($name) > 0) {
-                $query = $this->db->table('products')->where('barcode', $barcode)->where('name', $name)->get();
-            } else {
-                $query = $this->db->table('products')->like('barcode', $barcode)->orLike('name', $barcode)->get();
-            }
-
+            $query = $this->db->table('products')->like('barcode', $barcode)->orLike('name', $barcode)->get();
             $Data = $query->getNumRows();
 
             if ($Data > 1) {
@@ -142,32 +134,63 @@ class Transactions extends BaseController
                     'Data' => 'Many'
                 ];
             } else if ($Data == 1) {
-                $temp_transactions = $this->db->table('temp_transactions');
                 $row = $query->getRowArray();
-                $stock = $row['stocks'];
-                if (intval($stock) == 0) {
-                    $msg = [
-                        'error' => 'Stock isn\'t available'
-                    ];
-                } else if ($qty > intval($stock)) {
-                    $msg = [
-                        'error' => 'Stock isn\'t enough'
-                    ];
-                } else {
-                    $insert =  [
-                        'invoice' => $invoice,
+                $msg = [
+                    'success' => 'Success',
+                    'data' => [
                         'barcode' => $row['barcode'],
-                        'purchase_price' => $row['purchase_price'],
-                        'sell_price' => $row['sell_price'],
-                        'qty' => $qty,
-                        'subtotal' => floatval($row['sell_price']) * $qty
-                    ];
-                    $temp_transactions->insert($insert);
+                        'product' => $row['name']
+                    ]
+                ];
+            }
 
-                    $msg = ['success' => 'Success'];
+            echo json_encode($msg);
+        }
+    }
+
+    public function saveTemp()
+    {
+        if ($this->request->isAJAX()) {
+            $barcode = $this->request->getVar('barcode');
+            $name = $this->request->getVar('product');
+            $qty = $this->request->getVar('qty');
+            $invoice = $this->request->getVar('invoice');
+
+            if (!empty($barcode)) {
+                $query = $this->db->table('products')->where('barcode', $barcode)->where('name', $name)->get();
+
+                $Data = $query->getNumRows();
+
+                if ($Data == 1) {
+                    $temp_transactions = $this->db->table('temp_transactions');
+                    $row = $query->getRowArray();
+                    $stock = $row['stocks'];
+                    if (intval($stock) == 0) {
+                        $msg = [
+                            'error' => 'Stock isn\'t available'
+                        ];
+                    } else if ($qty > intval($stock)) {
+                        $msg = [
+                            'error' => 'Stock isn\'t enough'
+                        ];
+                    } else {
+                        $insert =  [
+                            'invoice' => $invoice,
+                            'barcode' => $row['barcode'],
+                            'purchase_price' => $row['purchase_price'],
+                            'sell_price' => $row['sell_price'],
+                            'qty' => $qty,
+                            'subtotal' => floatval($row['sell_price']) * $qty
+                        ];
+                        $temp_transactions->insert($insert);
+
+                        $msg = ['success' => 'Success'];
+                    }
+                } else {
+                    $msg = ['error' => 'Sorry No Such Product in Our Directory'];
                 }
             } else {
-                $msg = ['error' => 'Sorry No Such Product in Our Directory'];
+                $msg = ['error' => 'Please input a product first'];
             }
             echo json_encode($msg);
         }
@@ -408,7 +431,7 @@ class Transactions extends BaseController
             ->join('units', 'units.id = products.unit_id')
             ->where('transactions_detail.invoice', $invoice)->get();
 
-        $net_total = 0;
+        $gross_total = 0;
 
         foreach ($query_transactions_detail->getResultArray() as $data) {
             $printer->text(buatBaris1Kolom("$data[product]"));
@@ -418,11 +441,21 @@ class Transactions extends BaseController
                 number_format($data['sub_total'], 0)
             ));
 
-            $net_total += $data['sub_total'];
+            $gross_total += $data['sub_total'];
         }
 
         $printer->text(buatBaris1Kolom("------------------------------"));
-        $printer->text(buatBaris3Kolom("", "TOTAL: ", number_format($net_total, 0)));
+        $printer->text(buatBaris3Kolom("", "Gross Total: ", number_format($gross_total, 0)));
+        $printer->text("\n");
+        $printer->text(buatBaris3Kolom("", "Discount (%): ", number_format($row_transactions['discount_percent'], 0)));
+        $printer->text("\n");
+        $printer->text(buatBaris3Kolom("", "Discount (IDR): ", number_format($row_transactions['discount_idr'], 0)));
+        $printer->text("\n");
+        $printer->text(buatBaris3Kolom("", "Net Total: ", number_format($row_transactions['net_total'], 0)));
+        $printer->text("\n");
+        $printer->text(buatBaris3Kolom("", "Gross Total: ", number_format($row_transactions['payment_amount'], 0)));
+        $printer->text("\n");
+        $printer->text(buatBaris3Kolom("", "Gross Total: ", number_format($row_transactions['payment_change'], 0)));
         $printer->text("\n");
         $printer->text("Thanks For Your Visit");
 
@@ -443,11 +476,10 @@ class Transactions extends BaseController
             $request = Services::request();
             $transactionData = new transactionsDataModel($request);
 
-            // Use 'date' as the key to match what is sent from JavaScript
-            $date = $this->request->getPost('date'); // Make sure it's 'date' not 'selectedDate'
+            $date = $this->request->getPost('date');
 
             if ($request->getMethod(true) == 'POST') {
-                $lists = $transactionData->get_datatables($date); // Pass the date to the model method
+                $lists = $transactionData->get_datatables($date);
                 $data = [];
                 $num = $request->getPost("start");
                 foreach ($lists as $list) {
@@ -463,6 +495,7 @@ class Transactions extends BaseController
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->net_total, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->payment_amount, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->payment_change, 0, ",", ".") . '</div>'; // Format with 'Rp.' and align text to the right
+                    $row[] = "<button type=\"button\" class=\"btn btn-danger\" onclick=\"deleteData('" . $list->invoice . "')\">Delete</button>";
                     $data[] = $row;
                 }
                 $output = [
@@ -476,23 +509,38 @@ class Transactions extends BaseController
         }
     }
 
+    public function delete()
+    {
+        if ($this->request->isAJAX()) {
+            $invoice = $this->request->getPost('invoice');
+            $detail_data = $this->db->table('transactions_detail')->where('invoice', $invoice);
+
+            $delete_detail = $detail_data->delete();
+
+            if ($delete_detail) {
+                $this->db->table('transactions')->where('invoice', $invoice)->delete();
+
+                $msg = [
+                    'success' => 'Transactions deleted successfully'
+                ];
+            }
+        }
+        echo json_encode($msg);
+    }
+
     public function exportToCSV()
     {
-        // Instantiate the model
         $transactionData = new transactionsModel();
-        $date = $this->request->getGet('selectedDate'); // Get the selected date from the query string
+        $date = $this->request->getGet('selectedDate');
 
-        // Fetch the data using the model
         $lists = $transactionData->select('transactions.*, customers.name as customer')
             ->join('customers', 'customers.id = transactions.customer_id')
             ->where('DATE(date_time)', $date)
             ->findAll();
 
-        // Create a new Spreadsheet object
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Set the headers for the CSV file
         $headers = [
             'No',
             'Invoice',
@@ -507,30 +555,27 @@ class Transactions extends BaseController
         ];
         $sheet->fromArray($headers, NULL, 'A1');
 
-        // Populate the data in the CSV
-        $rowIndex = 2; // Start from the second row
+        $rowIndex = 2;
         $num = 1;
         foreach ($lists as $list) {
             $sheet->setCellValue('A' . $rowIndex, $num++);
             $sheet->setCellValue('B' . $rowIndex, $list['invoice']);
             $sheet->setCellValue('C' . $rowIndex, $list['date_time']);
             $sheet->setCellValue('D' . $rowIndex, $list['customer']);
-            $sheet->setCellValue('E' . $rowIndex, $list['discount_percent']); // Raw discount percent
-            $sheet->setCellValue('F' . $rowIndex, $list['discount_idr']); // Raw discount IDR
-            $sheet->setCellValue('G' . $rowIndex, $list['gross_total']); // Raw gross total
-            $sheet->setCellValue('H' . $rowIndex, $list['net_total']); // Raw net total
-            $sheet->setCellValue('I' . $rowIndex, $list['payment_amount']); // Raw payment amount
-            $sheet->setCellValue('J' . $rowIndex, $list['payment_change']); // Raw payment change
+            $sheet->setCellValue('E' . $rowIndex, $list['discount_percent']);
+            $sheet->setCellValue('F' . $rowIndex, $list['discount_idr']);
+            $sheet->setCellValue('G' . $rowIndex, $list['gross_total']);
+            $sheet->setCellValue('H' . $rowIndex, $list['net_total']);
+            $sheet->setCellValue('I' . $rowIndex, $list['payment_amount']);
+            $sheet->setCellValue('J' . $rowIndex, $list['payment_change']);
             $rowIndex++;
         }
 
-        // Set the HTTP headers to force a download of the file
         $filename = 'transactions_data_' . ($date ?: 'all') . '.csv';
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
 
-        // Create a CSV writer and output the file
         $writer = new Csv($spreadsheet);
         $writer->save('php://output');
 

@@ -28,72 +28,53 @@
 
                         <div class="card-body p-5">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <button type="button" class="btn btn-warning" onclick="window.location='<?= base_url('login/credential') ?>'">
+                                <button type="button" class="btn btn-warning" onclick="redirectTo()">
                                     <i class="fa fa-backward"></i> Back
                                 </button>
                                 <h3 class="mb-0 text-center" style="font-weight: 900; font-size: 2rem;">Change Password</h3>
                             </div>
-
-                            <?= form_open('', ['id' => 'formChange']) ?>
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="uuid" value="<?= $uuid ?>" id="uuid" readonly>
-                            <div style="height: 70px;">
-                                <div class="form-outline mb-4 d-flex">
-                                    <div class="input-group">
-                                        <input type="password" name="oldPassword" id="oldPassword" class="form-control" placeholder="Enter Your Old Password">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-default" id="toggleOldPassword" style="border-radius: 0 5px 5px 0;">
-                                                <i class="bi bi-eye-slash"></i>
-                                            </button>
-                                        </div>
-                                        <div id="errorOldPassword" class="invalid-feedback" style="display: none;">
-                                        </div>
-                                        <div class="valid-feedback" style="display: none;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="height: 70px;">
-                                <div class="form-outline mb-4 d-flex">
-                                    <div class="input-group">
-                                        <input type="password" name="newPassword" id="newPassword" class="form-control" placeholder="Enter Your New Password">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-default" id="toggleNewPassword" style="border-radius: 0 5px 5px 0;">
-                                                <i class="bi bi-eye-slash"></i>
-                                            </button>
-                                        </div>
-                                        <div id="errorNewPassword" class="invalid-feedback" style="display: none;">
-                                        </div>
-                                        <div class="valid-feedback" style="display: none;">
+                            <?php if (isset($error)): ?>
+                                <div class="alert alert-danger"><?= $error; ?></div>
+                            <?php else: ?>
+                                <?= form_open('', ['id' => 'formChange']) ?>
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="uuid" value="<?= $uuid ?>" id="uuid" readonly>
+                                <input type="hidden" name="token" value="<?= $token ?>" id="token" readonly>
+                                <div style="height: 70px;">
+                                    <div class="form-outline mb-4 d-flex">
+                                        <div class="input-group">
+                                            <input type="password" name="newPassword" id="newPassword" class="form-control" placeholder="Enter Your New Password">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-default" id="toggleNewPassword" style="border-radius: 0 5px 5px 0;">
+                                                    <i class="bi bi-eye-slash"></i>
+                                                </button>
+                                            </div>
+                                            <div id="errorNewPassword" class="invalid-feedback" style="display: none;">
+                                            </div>
+                                            <div class="valid-feedback" style="display: none;">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div style="height: 70px;">
-                                <div class="form-outline mb-4 d-flex">
-                                    <div class="input-group">
-                                        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" placeholder="Please Confirm Your Password">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-default" id="toggleConfirmPassword" style="border-radius: 0 5px 5px 0;">
-                                                <i class="bi bi-eye-slash"></i>
-                                            </button>
-                                        </div>
-                                        <div id="errorConfirmPassword" class="invalid-feedback" style="display: none;">
-                                        </div>
-                                        <div class="valid-feedback" style="display: none;">
+                                <div style="height: 70px;">
+                                    <div class="form-outline mb-4 d-flex">
+                                        <div class="input-group">
+                                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" placeholder="Please Confirm Your Password">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-default" id="toggleConfirmPassword" style="border-radius: 0 5px 5px 0;">
+                                                    <i class="bi bi-eye-slash"></i>
+                                                </button>
+                                            </div>
+                                            <div id="errorConfirmPassword" class="invalid-feedback" style="display: none;">
+                                            </div>
+                                            <div class="valid-feedback" style="display: none;">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="justify-content-between d-flex">
-                                <div class="form-check d-flex justify-content-end ">
-                                </div>
-                                <div class="mb-3">
-                                    <a href="<?= base_url('login/forget') ?>">Forgot Password?</a>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-lg btn-block" id="change" type="button">Change</button>
-                            <?= form_close() ?>
+                                <button class="btn btn-primary btn-lg btn-block" id="change" type="button">Change</button>
+                                <?= form_close() ?>
+                            <?php endif ?>
                         </div>
                     </div>
                 </div>
@@ -117,7 +98,7 @@
 
             $.ajax({
                 type: "post",
-                url: "<?= site_url('login/updatePassword') ?>",
+                url: "<?= site_url('login/newPassword') ?>",
                 data: data,
                 dataType: "json",
                 enctype: 'multipart/form-data',
@@ -135,13 +116,6 @@
                 success: function(response) {
                     if (response.error) {
                         let dataError = response.error;
-                        if (dataError.errorOldPassword) {
-                            $('#errorOldPassword').html(dataError.errorOldPassword).show();
-                            $('#oldPassword').addClass('is-invalid');
-                        } else {
-                            $('#errorOldPassword').fadeOut();
-                            $('#oldPassword').removeClass('is-invalid').addClass('is-valid');
-                        }
                         if (dataError.errorNewPassword) {
                             $('#errorNewPassword').html(dataError.errorNewPassword).show();
                             $('#newPassword').addClass('is-invalid');
@@ -164,7 +138,7 @@
                                 html: response.success
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location = '<?= site_url('/profile/' . $uuid) ?>';
+                                    window.location = '<?= site_url('users') ?>';
                                 }
                             });
                         } else {
@@ -185,19 +159,6 @@
                 }
             });
         })
-
-        document.getElementById('toggleOldPassword').addEventListener('click', function() {
-            var passwordField = document.getElementById('oldPassword');
-            var passwordFieldType = passwordField.type;
-
-            if (passwordFieldType === 'password') {
-                passwordField.type = 'text';
-                this.innerHTML = '<i class="bi bi-eye"></i>';
-            } else {
-                passwordField.type = 'password';
-                this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-            }
-        });
 
         document.getElementById('toggleNewPassword').addEventListener('click', function() {
             var passwordField = document.getElementById('newPassword');
@@ -224,6 +185,18 @@
                 this.innerHTML = '<i class="bi bi-eye-slash"></i>';
             }
         });
+
+        function redirectTo() {
+            const uuid = '<?= esc(session()->get('uuid')) ?>'; // Get the uuid from the session
+
+            if (uuid) {
+                // If the session exists, redirect to the profile page with uuid
+                window.location = '<?= site_url('profile/') ?>' + uuid;
+            } else {
+                // If session does not exist, redirect to the login page
+                window.location = '<?= site_url('login') ?>';
+            }
+        }
     </script>
 </body>
 

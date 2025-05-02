@@ -7,13 +7,13 @@
 <script src="<?= base_url('assets') ?>/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="<?= base_url('assets') ?>/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 
-<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" >
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="productModalLabel">All Product</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -69,8 +69,9 @@
         $('#barcode').val(barcode);
         $('#product').val(name);
         $('#productModal').on('hidden.bs.modal', function(event) {
-            $('#barcode').focus();
-            checkCode();
+            $('#qty').focus().select();
+            $('#barcode').val(barcode);
+            $('#name').val(name);
         })
         $('#productModal').modal('hide')
     }

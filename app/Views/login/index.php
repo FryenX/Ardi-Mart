@@ -68,7 +68,7 @@
                                     <label class="form-check-label" for="rememberMe"> Remember Me</label>
                                 </div>
                                 <div>
-                                    <a href="<?= base_url('login/username') ?>">Change Password?</a>
+                                    <a href="<?= base_url('login/credential') ?>">Change Password?</a>
                                 </div>
                             </div>
                             <button class="btn btn-primary btn-lg btn-block" id="login" type="submit">Login</button>

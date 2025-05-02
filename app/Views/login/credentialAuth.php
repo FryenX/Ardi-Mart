@@ -28,35 +28,28 @@
 
                         <div class="card-body p-5">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <button type="button" class="btn btn-warning" onclick="window.location='<?= site_url('login') ?>'">
+                                <button type="button" class="btn btn-warning" onclick="redirectTo()">
                                     <i class="fa fa-backward"></i> Back
                                 </button>
                                 <h3 class="mb-0 text-center" style="font-weight: 900; font-size: 2rem;">Change Password</h3>
                             </div>
 
-                            <?= form_open('', ['id' => 'formUsername']) ?>
+                            <?= form_open('', ['id' => 'formCredential']) ?>
                             <?= csrf_field() ?>
                             <div style="height: 60px;">
                                 <div class="form-outline mb-4 d-flex">
                                     <div class="input-group">
-                                        <input type="text" name="username" id="username" class="form-control" placeholder="Enter Your Username">
+                                        <input type="text" name="credential" id="credential" class="form-control" placeholder="Enter Your Login Credential">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <i class="fa fa-user"></i>
                                             </div>
                                         </div>
-                                        <div id="errorUsername" class="invalid-feedback" style="display: none;">
+                                        <div id="errorCredential" class="invalid-feedback" style="display: none;">
                                         </div>
                                         <div class="valid-feedback" style="display: none;">
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="justify-content-between d-flex">
-                                <div class="form-check d-flex justify-content-end ">
-                                </div>
-                                <div class="mb-3">
-                                    <a href="<?= base_url('login/forget') ?>">Forgot Password?</a>
                                 </div>
                             </div>
                             <button class="btn btn-primary btn-lg btn-block" id="login" type="submit">Reset</button>
@@ -77,13 +70,13 @@
     <script>
         $('#login').click(function(e) {
             e.preventDefault();
-            let username = $('#username').val();
-            let form = $('#formUsername')[0];
+            let credential = $('#credential').val();
+            let form = $('#formCredential')[0];
             let data = new FormData(form);
 
             $.ajax({
                 type: "post",
-                url: "<?= site_url('login/verifyUsername') ?>",
+                url: "<?= site_url('login/verifyCredential') ?>",
                 data: data,
                 dataType: "json",
                 enctype: 'multipart/form-data',
@@ -101,12 +94,12 @@
                 success: function(response) {
                     if (response.error) {
                         let dataError = response.error;
-                        if (dataError.errorUsername) {
-                            $('#errorUsername').html(dataError.errorUsername).show();
-                            $('#username').addClass('is-invalid');
+                        if (dataError.errorCredential) {
+                            $('#errorCredential').html(dataError.errorCredential).show();
+                            $('#credential').addClass('is-invalid');
                         } else {
-                            $('#errorUsername').fadeOut();
-                            $('#username').removeClass('is-invalid').addClass('is-valid');
+                            $('#errorCredential').fadeOut();
+                            $('#credential').removeClass('is-invalid').addClass('is-valid');
                         }
                     } else {
                         if (response.success) {
@@ -119,6 +112,18 @@
                 }
             });
         });
+
+        function redirectTo() {
+            const uuid = '<?= esc(session()->get('uuid')) ?>'; // Get the uuid from the session
+
+            if (uuid) {
+                // If the session exists, redirect to the profile page with uuid
+                window.location = '<?= site_url('profile/') ?>' + uuid;
+            } else {
+                // If session does not exist, redirect to the login page
+                window.location = '<?= site_url('login') ?>';
+            }
+        }
     </script>
 </body>
 

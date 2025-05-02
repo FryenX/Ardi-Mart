@@ -335,6 +335,13 @@
                         $('#errorSellPrice').fadeOut();
                         $('#sell_price').removeClass('is-invalid').addClass('is-valid');
                     }
+                    if (dataError.errorUploadImage) {
+                        $('#errorUploadImage').html(dataError.errorUploadImage).show();
+                        $('#errorUploadImage').addClass('is-invalid');
+                    } else {
+                        $('#errorUploadImage').fadeOut();
+                        $('#errorUploadImage').removeClass('is-invalid').addClass('is-valid');
+                    }
                 } else {
                     Swal.fire({
                         icon: "success",

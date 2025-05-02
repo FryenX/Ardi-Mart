@@ -11,13 +11,20 @@ class UuidFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         $uri = service('uri');
-        $uuid = $uri->getSegment(2); // The second segment is the UUID
+        $segments = $uri->getSegments(); // Get all segments of the URI
 
         // Regular expression for UUID validation
-        if (!preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/', $uuid)) {
-            // Return an HTTP 404 if the UUID is invalid
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        $uuidRegex = '/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/';
+
+        // Iterate through segments to find a valid UUID
+        foreach ($segments as $segment) {
+            if (preg_match($uuidRegex, $segment)) {
+                return; // If a valid UUID is found, exit the method
+            }
         }
+
+        // If no valid UUID is found, return an HTTP 404 error
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

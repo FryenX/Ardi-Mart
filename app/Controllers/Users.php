@@ -313,6 +313,19 @@ class Users extends BaseController
                     'updated_at' => Time::now(),
                 ]);
 
+                $currentId = session()->get('uuid');
+                if ($uuid == $currentId) {
+                    $data = $this->users->join('levels', 'levels.id = level_id')->where('uuid', $uuid)->get()->getRowArray();
+                    if ($data) {
+                        session()->set([
+                            'name'        => $data['name'],
+                            'level_info'  => $data['info'],
+                            'username'    => $data['username'],
+                            'image'       => $data['image'],
+                        ]);
+                    }
+                }
+
                 $msg = ['success' => 'User Successfully Edited'];
             }
 
@@ -404,15 +417,13 @@ class Users extends BaseController
 
     public function profile($uuid)
     {
-        $row = $this->users->where('uuid', $uuid)->first();
+        $row = $this->users->join('levels', 'levels.id = users.level_id')->where('uuid', $uuid)->first();
 
         if ($row) {
             $data = [
-                'id'       => $row['id'],
                 'uuid'     => $row['uuid'],
                 'name'     => $row['name'],
-                'level_id' => $row['level_id'],
-                'data_level' => $this->levels->findAll(),
+                'level'    => $row['info'],
                 'username' => $row['username'],
                 'email'    => $row['email'],
                 'image'    => $row['image'],
@@ -420,6 +431,124 @@ class Users extends BaseController
             return view('users/profile', $data);
         } else {
             exit('No Data Found 404');
+        }
+    }
+
+    public function editProfile($uuid)
+    {
+        $row = $this->users->join('levels', 'levels.id = users.level_id')->where('uuid', $uuid)->first();
+        $rowLevel = $this->levels->where('levels.id', $row['level_id'])->first();
+
+        if ($row) {
+            $data = [
+                'uuid'          => $row['uuid'],
+                'name'          => $row['name'],
+                'level_id'      => $row['level_id'],
+                'data_level'    => $rowLevel['info'],
+                'username'      => $row['username'],
+                'email'         => $row['email'],
+                'image'         => $row['image'],
+            ];
+            return view('users/editProfile', $data);
+        } else {
+            exit('No Data Found 404');
+        }
+    }
+
+    public function saveUserData()
+    {
+        if ($this->request->isAJAX()) {
+
+            $uuid     = $this->request->getVar('uuid');
+            $name     = $this->request->getVar('name');
+            $username = $this->request->getVar('username');
+            $email    = $this->request->getVar('email');
+
+            $validation = \Config\Services::validation();
+
+            $doValid = $this->validate([
+                'name' => [
+                    'label'  => 'Name',
+                    'rules'  => 'required',
+                    'errors' => [
+                        'required' => '{field} Can\'t be Empty'
+                    ]
+                ],
+                'username' => [
+                    'label'  => 'Username',
+                    'rules'  => 'required|is_unique[users.username,uuid,' . $uuid . ']',
+                    'errors' => [
+                        'required'  => '{field} Can\'t be empty',
+                        'is_unique'  => '{field} Already Existed',
+                    ]
+                ],
+                'email' => [
+                    'label'  => 'Email',
+                    'rules'  => 'required|valid_email|is_unique[users.email,uuid,' . $uuid . ']',
+                    'errors' => [
+                        'required'  => '{field} Can\'t be empty',
+                        'is_unique'  => '{field} Already Existed',
+                    ]
+                ],
+                'upload_image' => [
+                    'label' => 'Image',
+                    'rules' => 'mime_in[image,image/png,image/jpeg]|ext_in[image,png,jpg]|is_image[image]',
+                ]
+            ]);
+
+            if (!$doValid) {
+                $msg = [
+                    'error' => [
+                        'errorName' => $validation->getError('name'),
+                        'errorUserName' => $validation->getError('username'),
+                        'errorEmail' => $validation->getError('email'),
+                        'errorUploadImage' => $validation->getError('upload_image')
+                    ]
+                ];
+            } else {
+                $uuid = $this->request->getVar('uuid');
+                $file_upload = $_FILES['image']['name'];
+
+                $rowDataUsers = $this->users->find($uuid);
+
+                if ($file_upload != NULL) {
+                    if ($rowDataUsers && !empty($rowDataUsers['image'])) {
+                        $imagePath = $_SERVER['DOCUMENT_ROOT'] . $rowDataUsers['image'];
+
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                    }
+                    $image_name = "$username-$name";
+                    $image_file = $this->request->getFile('image');
+                    $image_file->move('assets/upload/users/', $image_name . '.' . $image_file->getExtension());
+
+                    $path_image = '/assets/upload/users/' . $image_file->getName();
+                } else {
+                    $path_image = $rowDataUsers['image'];
+                }
+
+                $this->users->update($uuid, [
+                    'name' => $name,
+                    'username' => $username,
+                    'email' => $email,
+                    'image' => $path_image,
+                    'updated_at' => Time::now(),
+                ]);
+
+                $data = $this->users->where('uuid', $uuid)->get()->getRowArray();
+                if ($data) {
+                    session()->set([
+                        'name'        => $data['name'],
+                        'username'    => $data['username'],
+                        'image'       => $data['image'],
+                    ]);
+                }
+
+                $msg = ['success' => 'User Successfully Edited'];
+            }
+
+            echo json_encode($msg);
         }
     }
 }
