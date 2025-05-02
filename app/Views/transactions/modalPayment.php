@@ -62,6 +62,7 @@
         </div>
     </div>
 </div>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-qITb48Ltqmyiucal"></script>
 <script>
     function paymentGateway() {
         $.ajax({
@@ -137,16 +138,18 @@
                             invoice: saveResp.invoice
                         },
                         success: function(printResp) {
-                            if (printResp.success) {
-                                if (status === 'succ') {
-                                    Swal.fire({
-                                        title: "Printed!",
-                                        html: 'Invoice printed successfully',
-                                        icon: "success"
-                                    }).then(() => {
-                                        window.location.reload();
-                                    });
-                                }
+                            if (status === 'success') {
+                                Swal.fire({
+                                    title: "Printed!",
+                                    html: 'Invoice printed successfully',
+                                    icon: "success"
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else if (status === 'pending') {
+                                alert('Transaction is pending.');
+                            } else {
+                                alert('Transaction failed.');
                             }
                         },
                         error: function(xhr, thrownError) {

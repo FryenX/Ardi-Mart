@@ -12,7 +12,7 @@ use Mike42\Escpos\Printer;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
-\Midtrans\Config::$serverKey = 'SB-Mid-server-MfLAGbgCiHH5HmV1LJQIL4BR';
+\Midtrans\Config::$serverKey = env('MIDTRANS_ACCESS_KEY');;
 \Midtrans\Config::$isProduction = false;
 \Midtrans\Config::$isSanitized = true;
 \Midtrans\Config::$is3ds = true;
@@ -400,7 +400,7 @@ class Transactions extends BaseController
             $net_total = str_replace(",", "", $this->request->getPost('net_total'));
             $disc_percent = str_replace(",", "", $this->request->getPost('disc_percent'));
             $disc_idr = str_replace(",", "", $this->request->getPost('disc_idr'));
-            $payment = $this->request->getPost('payment'); 
+            $payment = $this->request->getPost('payment');
             $cash = str_replace(",", "", $this->request->getPost('cash_amount'));
             $transfer = str_replace(",", "", $this->request->getPost('transfer') ?? $net_total);
             $change = str_replace(",", "", $this->request->getPost('change'));
@@ -651,32 +651,29 @@ class Transactions extends BaseController
                 $num = $request->getPost("start");
 
                 foreach ($lists as $list) {
-                    $paymentLabel = '';
-                    switch (strtolower($list->payment_method)) {
-                        case 'cash':
-                            $paymentLabel = '<span class="badge badge-success">Cash</span>';
-                            break;
-                        case 'transfer':
-                            $paymentLabel = '<span class="badge badge-warning">Transfer</span>';
-                            break;
-                        default:
-                            $paymentLabel = '<span class="badge badge-secondary">' . ucfirst($list->payment_method) . '</span>';
-                            break;
-                    }
-
                     $num++;
                     $row = [];
                     $row[] = $num;
                     $row[] = $list->invoice;
                     $row[] = $list->date_time;
                     $row[] = $list->customer;
-                    $row[] = $list->discount_percent . ' %';
-                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->discount_idr, 0, ",", ".") . '</div>';
-                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->gross_total, 0, ",", ".") . '</div>';
                     $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->net_total, 0, ",", ".") . '</div>';
-                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->payment_amount, 0, ",", ".") . '</div>';
-                    $row[] = '<div style="text-align: right;">Rp. ' . number_format($list->payment_change, 0, ",", ".") . '</div>';
-                    $row[] = $paymentLabel;
+                    if ($list->payment_method == 'Cash') {
+                        $row[] = "<span class=\"badge badge-success\">" . $list->payment_method . "</span>";
+                    } else {
+                        $row[] = "<span class=\"badge badge-warning\">" . $list->payment_method . "</span>";
+                    }
+                    if ($list->payment_method == 'Transfer') {
+                        if ($list->status == 'Pending') {
+                            $row[] = "<span class=\"badge badge-warning\">Pending</span>";
+                        } else if ($list->status == 'settlement') {
+                            $row[] = "<span class=\"badge badge-success\">Success</span>";
+                        } else {
+                            $row[] = "<span class=\"badge badge-danger\">Expired</span>";
+                        }
+                    } else {
+                        $row[] = "<span class=\"badge badge-primary\"><i class=\"fa fa-check\"></i></span>";
+                    }
                     $row[] = "<button type=\"button\" class=\"btn btn-danger\" onclick=\"deleteData('" . $list->invoice . "')\">Delete</button>";
                     $data[] = $row;
                 }

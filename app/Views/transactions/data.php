@@ -18,7 +18,7 @@
                 <h3 class="card-title">
                     <button type="button" class="btn btn-warning btn-sm mb-3"
                         onclick="window.location='<?= site_url('transactions') ?>'"><i class="fa fa-backward"></i> Kembali</button>
-                    <br/>
+                    <br />
                     <i class="fa fa-file-invoice"></i> Transactions
                 </h3>
             </div>
@@ -57,13 +57,9 @@
                     <th>Invoice</th>
                     <th>Date</th>
                     <th>Customer</th>
-                    <th>Discount <i>(%)</i></th>
-                    <th>Discount <i>(IDR)</i></th>
-                    <th>Gross Total</th>
                     <th>Net Total</th>
-                    <th>Payment Amount</th>
-                    <th>Change</th>
                     <th>Payment Method</th>
+                    <th>Status</th>
                     <?php
                     if ($userLevel == 'Admin' || $userLevel == 'Manager') {
                         echo "<th>#</th>";
@@ -81,9 +77,7 @@
 <script>
     $(document).ready(function() {
         showTransactionsData();
-    });
 
-    $(document).ready(function() {
         $('#printBtn').click(function(e) {
             e.preventDefault();
 
@@ -92,8 +86,18 @@
 
             window.location.href = "<?= site_url('transactions/exportToCSV') ?>?startDate=" + startDate + "&endDate=" + endDate;
         });
-    });
 
+        $('#startDate, #endDate').on('change', function() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert('Start date cannot be greater than end date.');
+
+                $('#endDate').val('');
+            }
+        });
+    });
 
     function showTransactionsData() {
         var table = $('#transactionsData').DataTable({
@@ -101,7 +105,7 @@
             "serverSide": true,
             "autoWidth": false,
             "responsive": true,
-            "order": [],
+            "order": [], // Default order
             "ajax": {
                 "url": "<?= site_url('transactions/showTransactionsData') ?>",
                 "type": "POST",
@@ -113,15 +117,13 @@
                 }
             },
             "columnDefs": [{
-                "targets": [0, 2],
-                "orderable": false,
-            }],
+                    "targets": [0, 7],
+                    "orderable": false
+                }
+            ]
         });
 
-        $('#startDate').on('change', function() {
-            table.ajax.reload();
-        });
-        $('#endDate').on('change', function() {
+        $('#startDate, #endDate').on('change', function() {
             table.ajax.reload();
         });
     }

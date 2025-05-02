@@ -8,8 +8,8 @@ use CodeIgniter\Model;
 class transactionsDataModel extends Model
 {
     protected $table = "transactions";
-    protected $column_order = array(null, 'invoice', 'date_time', 'customer', 'discount_percent', 'discount_idr', 'gross_total', 'net_total', 'payment_amount', 'payment_change', 'payment_method',null);
-    protected $column_search = array('invoice', 'date_time', 'customers.name');
+    protected $column_order = array(null, 'invoice', 'date_time', 'customer', 'net_total', 'payment_method', 'status', null);
+    protected $column_search = array('invoice', 'date_time', 'customers.name', 'payment_method','status');
     protected $order = array('date_time' => 'desc');
     protected $request;
     protected $db;
@@ -28,7 +28,9 @@ class transactionsDataModel extends Model
             ->select('transactions.*, customers.name as customer')
             ->join('customers', 'customers.id = transactions.customer_id');
 
-        if ($startDate && $endDate) {
+        if ($startDate) {
+            $this->dt->where("DATE(date_time) >=", $startDate);
+        } else if ($startDate && $endDate) {
             $this->dt->where("DATE(date_time) >=", $startDate);
             $this->dt->where("DATE(date_time) <=", $endDate);
         }

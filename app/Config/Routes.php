@@ -117,4 +117,4 @@ $routes->post('transactions/exportToCSV', 'Transactions::exportToCSV');
 
 $routes->set404Override();
 
-$routes->get('pay', 'Pay::index');
+// $routes->get('pay', 'Pay::index');

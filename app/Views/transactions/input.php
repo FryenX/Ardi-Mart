@@ -102,7 +102,6 @@
 </div>
 <div id="viewModal" style="display: none;"></div>
 <div id="viewModalPayment" style="display: none;"></div>
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-MfLAGbgCiHH5HmV1LJQIL4BR"></script>
 <script>
     $(document).ready(function() {
         createInvoice();
