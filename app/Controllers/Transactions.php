@@ -664,7 +664,7 @@ class Transactions extends BaseController
                         $row[] = "<span class=\"badge badge-warning\">" . $list->payment_method . "</span>";
                     }
                     if ($list->payment_method == 'Transfer') {
-                        if ($list->status == 'Pending') {
+                        if ($list->status == 'pending') {
                             $row[] = "<span class=\"badge badge-warning\">Pending</span>";
                         } else if ($list->status == 'settlement') {
                             $row[] = "<span class=\"badge badge-success\">Success</span>";
