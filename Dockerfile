@@ -7,7 +7,9 @@ RUN a2enmod rewrite
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip \
-    && docker-php-ext-install pdo pdo_mysql zip
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    libicu-dev \
+    && docker-php-ext-install pdo pdo_mysql zip intl gd
 
 # Set working directory
 WORKDIR /var/www/html
