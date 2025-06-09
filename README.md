@@ -37,7 +37,7 @@ Ardi-Mart is a modern Point of Sale (POS) web application built using **CodeIgni
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ardi-mart.git
+   git clone https://github.com/FryenX/Ardi-Mart.git
    cd ardi-mart
 2. Install dependencies via Composer:
     ```bash
@@ -63,6 +63,7 @@ Ardi-Mart is a modern Point of Sale (POS) web application built using **CodeIgni
 | Role    | Username | Password |
 | ------- | -------- | -------- |
 | Admin   | admin    | admin    |
+| Manager | manager  | manager  |
 | Cashier | cashier  | cashier  |
 
 /app

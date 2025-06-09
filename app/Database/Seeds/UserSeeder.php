@@ -10,16 +10,40 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        $uuid = Uuid::uuid4()->toString();
+        $uuidAdmin = Uuid::uuid4()->toString();
+        $uuidManager = Uuid::uuid4()->toString();
+        $uuidCashier = Uuid::uuid4()->toString();
 
         $data = [
             [
-                'uuid'       =>  $uuid,
-                'name'       => 'Ardi',
+                'uuid'       => $uuidAdmin,
+                'name'       => 'Admin',
                 'level_id'   => '1',
-                'username'   => 'ardiwidana',
-                'email'      => 'ardiwidana@gmail.com',
-                'password'   => password_hash('ardi2405', PASSWORD_BCRYPT),
+                'username'   => 'admin',
+                'email'      => 'admin@gmail.com',
+                'password'   => password_hash('admin', PASSWORD_BCRYPT),
+                'image'      => '',
+                'created_at' => Time::now(),
+                'updated_at' => Time::now(),
+            ],
+            [
+                'uuid'       => $uuidManager,
+                'name'       => 'Manager',
+                'level_id'   => '2',
+                'username'   => 'manager',
+                'email'      => 'manager@gmail.com',
+                'password'   => password_hash('manager', PASSWORD_BCRYPT),
+                'image'      => '',
+                'created_at' => Time::now(),
+                'updated_at' => Time::now(),
+            ],
+            [
+                'uuid'       => $uuidCashier,
+                'name'       => 'Cashier',
+                'level_id'   => '3',
+                'username'   => 'cashier',
+                'email'      => 'cashier@gmail.com',
+                'password'   => password_hash('cashier', PASSWORD_BCRYPT),
                 'image'      => '',
                 'created_at' => Time::now(),
                 'updated_at' => Time::now(),
