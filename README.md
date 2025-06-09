@@ -1,68 +1,73 @@
-# CodeIgniter 4 Application Starter
+# 🛒 Ardi-Mart - Web POS System (CodeIgniter 4)
 
-## What is CodeIgniter?
+Ardi-Mart is a modern Point of Sale (POS) web application built using **CodeIgniter 4**. It features a complete management system for sales transactions, users, products, categories, units, and levels with a simple and intuitive interface.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+---
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## 📸 Preview
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+![Cashier Input Page](public/images/ardi-mart-cashier-input.png)
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+> Screenshot of the **Cashier Input** page where users can add products using barcodes, manage quantities, and finalize transactions.
 
-## Installation & updates
+---
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+## 🚀 Features
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+- 🧾 Cashier input with invoice and product barcode
+- 📦 Product and stock management
+- 🧍 User and level management
+- 📂 Category and unit organization
+- 🔐 Secure login/logout system
+- 🗃️ Transaction record keeping
 
-## Setup
+---
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+## ⚙️ Built With
 
-## Important Change with index.php
+- [CodeIgniter 4](https://codeigniter.com/)
+- PHP 7.4+
+- MySQL
+- Bootstrap 5
+- jQuery & DataTables
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+---
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+## 🛠️ Installation
 
-**Please** read the user guide for a better explanation of how CI4 works!
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ardi-mart.git
+   cd ardi-mart
+2. Install dependencies via Composer:
+    composer install
 
-## Repository Management
+3. Configure your .env file:
+    cp env .env
+    php spark key:generate
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+4. Set your base URL and database credentials in .env.
+   
+6. Run database migrations and seeders if available:
+    php spark migrate
+    php spark db:seed LevelSeeder
+    php spark db:seed UserSeeder
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+7. Serve the application:
+    php spark serve
 
-## Server Requirements
+| Role    | Username | Password |
+| ------- | -------- | -------- |
+| Admin   | admin    | admin    |
+| Cashier | cashier  | cashier  |
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+/app
+/public
+/writable
+/tests
+.env
+composer.json
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
-
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
-
-Additionally, make sure that the following extensions are enabled in your PHP:
-
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+This project is licensed under the MIT License. See the LICENSE file for details.
+Developed by Ardi Widana
+📧 Contact: ardiwidana.gg@gmail.com
