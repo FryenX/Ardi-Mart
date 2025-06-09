@@ -1,10 +1,7 @@
 services:
   - type: web
     name: ardi-mart
-    env: php
+    env: docker
     plan: free
-    buildCommand: composer install
-    startCommand: php -S 0.0.0.0:10000 -t public
-    envVars:
-      - key: CI_ENVIRONMENT
-        value: production
+    branch: main
+    dockerfilePath: ./Dockerfile
