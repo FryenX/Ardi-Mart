@@ -6,7 +6,7 @@ Ardi-Mart is a modern Point of Sale (POS) web application built using **CodeIgni
 
 ## 📸 Preview
 
-![Cashier Input Page](public/upload/preview/Preview-input.png)
+![Cashier Input Page](public/assets/upload/preview/Preview-input.png)
 
 > Screenshot of the **Cashier Input** page where users can add products using barcodes, manage quantities, and finalize transactions.
 
